@@ -1,0 +1,14 @@
+{% extends "index.html" %}
+{% block git_graph %}
+    <div class="graph">
+        <!-- Prepare a container for your calendar. -->
+        <script src="https://cdn.rawgit.com/IonicaBizau/github-calendar/gh-pages/dist/github-calendar.min.js"></script>
+        <link rel="stylesheet" href="{% static 'commitgraph.css' %}"/>
+        <div class="calendar">
+            Loading contribution data
+        </div>
+        <script>
+            new GitHubCalendar(".calendar", "logikill99");
+        </script>
+    </div>
+{% endblock %}

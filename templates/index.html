@@ -1,53 +1,34 @@
-{% load static %}
-
-<link rel="stylesheet" href="{% static 'style.css' %}">
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Developer Portfolio</title>
-    <link rel="stylesheet" href="{% static 'style.css' %}">
-</head>
-<body>
-<header>
-    <h1>Matthew Levin</h1>
-    <p>Full Stack Developer</p>
-</header>
-<section id="about">
-    <h2>About Me</h2>
-    <p>Passionate developer with experience in building web applications.</p>
-    <div class="graph">
-        <!-- Prepare a container for your calendar. -->
-        <script src="https://cdn.rawgit.com/IonicaBizau/github-calendar/gh-pages/dist/github-calendar.min.js"></script>
-
-        <link rel="stylesheet" href="{% static 'commitgraph.css' %}"/>
-
-        <div class="calendar">
-            Loading contribution data
+{% extends "base.html" %}
+{% block page_content %}
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Developer Portfolio</title>
+    </head>
+    <header>
+        <h1>Matthew Levin</h1>
+        <p>Full Stack Developer</p>
+    </header>
+    <section id="about">
+        <h2>About Me</h2>
+        <p>Passionate developer with experience in building web applications.</p>
+    </section>
+    {% block git_graph %}
+    {% endblock %}
+    <section id="projects">
+        <h2>Projects</h2>
+        <div class="project">
+            <h3>Project One</h3>
+            <p>Description of project one.</p>
         </div>
-
-        <script>
-            new GitHubCalendar(".calendar", "logikill99");
-        </script>
-    </div>
-</section>
-<section id="projects">
-    <h2>Projects</h2>
-    <div class="project">
-        <h3>Project One</h3>
-        <p>Description of project one.</p>
-    </div>
-    <div class="project">
-        <h3>Project Two</h3>
-        <p>Description of project two.</p>
-    </div>
-</section>
-<section id="contact">
-    <h2>Contact</h2>
-    <p>Email: john.doe@example.com</p>
-    <a href="{% url 'contactme' %}">Contact Me</a>
-</section>
-</body>
-</html>
+        <div class="project">
+            <h3>Project Two</h3>
+            <p>Description of project two.</p>
+        </div>
+    </section>
+    <section id="contact">
+        <h2>Contact</h2>
+        <p>Email: john.doe@example.com</p>
+        <a href="{% url 'contactme' %}">Contact Me</a>
+    </section>
+{% endblock %}
