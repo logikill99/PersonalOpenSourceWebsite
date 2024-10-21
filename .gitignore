@@ -30,4 +30,4 @@ PersonalHomePage/__pycache__/__init__.cpython-312.pyc
 PersonalHomePage/__pycache__/settings.cpython-312.pyc
 PersonalHomePage/__pycache__/urls.cpython-312.pyc
 PersonalHomePage/__pycache__/wsgi.cpython-312.pyc
-.env
+PersonalHomePage/.env
