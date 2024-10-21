@@ -2,63 +2,67 @@
 
 @import url('https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap');
 
+:root {
+    --accent-color: #403A36;
+    --background-color: #292522;
+    --text-color: #ECE1D7;
+    --header-bg-color: #34302C;
+    --header-text-color: #E49B5D;
+    --secondary-text-color: #C1A78E;
+    --border-color: #333;
+}
+
 body {
     margin: 0;
     padding: 0;
-    background-color: #121212;
-    color: #E0E0E0;
+    background-color: var(--background-color);
+    color: var(--text-color);
     font-family: 'Roboto', sans-serif;
 }
 
 header {
     text-align: center;
     padding: 60px 0;
-    background-color: #1F1F1F;
-    border-bottom: 1px solid #333;
+    background-color: var(--header-bg-color);
+    border-bottom: 1px solid var(--border-color);
 }
 
 header h1 {
     font-size: 3em;
     margin: 0;
-    color: #FFFFFF;
+    color: var(--header-text-color);
 }
 
 header p {
     font-size: 1.5em;
-    color: #A0A0A0;
+    color: var(--secondary-text-color);
     margin-top: 10px;
 }
 
-#navbar {
-    width: auto;
-    height: auto;
+header#navbar {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    padding: 10px 40px;
-    background: var(--header-bg);
-    color: var(--header-color);
+    align-items: flex-start;
+    padding: 10px 10px;
+    background-color: var(--header-bg-color);
+    color: var(--text-color);
 }
 
-#navbar a:link, #navbar a:visited, #logout-form button {
-    color: var(--header-link-color);
+nav > a {
+    color: var(--text-color);
+    text-decoration: none;
+    margin: 0 10px;
 }
 
-#navbar a:focus , #navbar a:hover {
+nav > a:hover {
     text-decoration: underline;
 }
 
 #site-name {
-    padding: 0;
-    margin: 0;
-    margin-inline-end: 20px;
-    font-weight: 300;
+    font-weight: 700;
+    padding-left: 10px;
     font-size: 1.5rem;
-    color: var(--header-branding-color);
-}
-
-#site-name a:link, #site-name a:visited {
-    color: var(--accent);
+    color: var(--header-text-color);
 }
 
 section {
@@ -68,85 +72,74 @@ section {
 section h2 {
     font-size: 2.5em;
     margin-bottom: 30px;
-    color: #FFFFFF;
-    border-bottom: 2px solid #333;
+    color: var(--header-text-color);
+    border-bottom: 2px solid var(--border-color);
     padding-bottom: 10px;
 }
 
-#about p, #contact p {
-    font-size: 1.2em;
-    line-height: 1.6;
-    color: #CCCCCC;
+.blog-list .post {
+    margin-bottom: 40px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border-color);
 }
 
-.graph {
-    margin-top: 40px;
-    text-align: center;
-}
-
-.calendar {
-    max-width: 100%;
-    margin: 0 auto;
-}
-
-#projects {
-    display: list-item;
-    justify-content: space-between;
-}
-
-.project {
-    background-color: #1F1F1F;
-    width: 48%;
-    padding: 20px;
-    margin-bottom: 30px;
-    border-radius: 8px;
-    transition: transform 0.3s;
-}
-
-.project:hover {
-    transform: translateY(-10px);
-}
-
-.project h3 {
-    margin-top: 0;
+.blog-list .post h3 {
     font-size: 1.8em;
-    color: #FFFFFF;
+    margin-bottom: 10px;
 }
 
-.project p {
-    color: #B0B0B0;
-    font-size: 1em;
+.blog-list .post h3 a {
+    color: var(--header-text-color);
+    text-decoration: none;
 }
 
-.projectContainer {
-    display: flex;
-    gap: normal;
-    justify-content: space-between;
+.blog-list .post h3 a:hover {
+    color: var(--accent-color);
+}
+
+.blog-list .post .post-date {
+    font-size: 0.9em;
+    color: var(--secondary-text-color);
+    margin-bottom: 10px;
+}
+
+.blog-list .post p {
+    line-height: 1.6;
+}
+
+.blog-list .post .read-more {
+    color: var(--accent-color);
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.blog-list .post .read-more:hover {
+    text-decoration: underline;
 }
 
 a {
-    color: #64B5F6;
+    color: var(--text-color);
     text-decoration: none;
     border-bottom: 1px solid transparent;
     transition: border-bottom 0.3s;
 }
 
 a:hover {
-    border-bottom: 1px solid #64B5F6;
+    border-bottom: 1px solid var(--accent-color);
 }
 
 #contact a {
     display: inline-block;
     margin-top: 20px;
     padding: 10px 20px;
-    background-color: #64B5F6;
+    background-color: var(--accent-color);
     color: #FFFFFF;
     border-radius: 5px;
     transition: background-color 0.3s;
 }
 
 #contact a:hover {
-    background-color: #42A5F5;
+    background-color: var(--background-color);
 }
 
 @media (max-width: 768px) {
@@ -154,7 +147,7 @@ a:hover {
         padding: 30px 10%;
     }
 
-    #projects {
+    .projectContainer {
         flex-direction: column;
     }
 

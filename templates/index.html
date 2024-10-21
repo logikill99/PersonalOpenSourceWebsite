@@ -17,14 +17,15 @@
     {% endblock %}
     <section id="projects">
         <h2>Projects</h2>
-        <div class="project">
-            <h3>Project One</h3>
-            <p>Description of project one.</p>
-        </div>
-        <div class="project">
-            <h3>Project Two</h3>
-            <p>Description of project two.</p>
-        </div>
+        {% block projects %}
+            {% for project in projects %}
+                <div class="project">
+                    <h3>{{ project.title }}</h3>
+                    <p>Description of project one.</p>
+                </div>
+            {% endfor %}
+        {% endblock projects%}
+
     </section>
     <section id="contact">
         <h2>Contact</h2>
