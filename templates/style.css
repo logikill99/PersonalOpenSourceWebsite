@@ -108,13 +108,14 @@ section h2 {
 }
 
 .blog-list .post .read-more {
-    color: var(--accent-color);
+    color: var(--secondary-text-color);
     text-decoration: none;
     font-weight: bold;
 }
 
 .blog-list .post .read-more:hover {
-    text-decoration: underline;
+    color: var(--accent-color);
+    transition: color 0.3s;
 }
 
 a {
@@ -154,4 +155,41 @@ a:hover {
     .project {
         width: 100%;
     }
+}
+
+
+#projects {
+    display: list-item;
+    justify-content: space-between;
+}
+
+.project {
+    background-color: var(--header-bg-color);
+    width: 48%;
+    padding: 20px;
+    margin-bottom: 30px;
+    border-radius: 8px;
+    transition: transform 0.3s;
+}
+
+.project:hover {
+    transform: translateY(-10px);
+    background-color: var(--accent-color);
+}
+
+.project h3 {
+    margin-top: 0;
+    font-size: 1.8em;
+    color: var(--secondary-text-color);
+}
+
+.project p {
+    color: var(--text-color);
+    font-size: 1em;
+}
+
+.projectContainer {
+    display: flex;
+    gap: normal;
+    justify-content: space-between;
 }

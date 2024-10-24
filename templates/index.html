@@ -9,10 +9,8 @@
         <h1>Matthew Levin</h1>
         <p>Full Stack Developer</p>
     </header>
-    <section id="about">
-        <h2>About Me</h2>
-        <p>Passionate developer with experience in building web applications.</p>
-    </section>
+    {% block about_me %}
+    {% endblock about_me%}
     {% block git_graph %}
     {% endblock %}
     <section id="projects">
