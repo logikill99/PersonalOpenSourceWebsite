@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block page_content %}
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Developer Portfolio</title>
+    </head>
+    <header>
+        <h1>Matthew Levin</h1>
+        <p>Full Stack Developer</p>
+    </header>
+    {% block about_me %}
+    {% endblock about_me%}
+    {% block git_graph %}
+    {% endblock %}
+    <section id="projects">
+        <h2>Projects</h2>
+        {% block projects %}
+            {% for project in projects %}
+                <div class="project">
+                    <h3>{{ project.title }}</h3>
+                    <p>Description of project one.</p>
+                </div>
+            {% endfor %}
+        {% endblock projects%}
+
+    </section>
+    <section id="contact">
+        <h2>Contact</h2>
+        <p>Email: john.doe@example.com</p>
+        <a href="{% url 'contactme' %}">Contact Me</a>
+    </section>
+{% endblock %}

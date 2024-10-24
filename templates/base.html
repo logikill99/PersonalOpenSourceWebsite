@@ -1,0 +1,20 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<body>
+<header id="navbar">
+    <div id="site-name">
+        <a id="site-name">site name</a>
+    </div>
+    <nav>
+        <a href="{% url 'home' %}">Home</a>
+        <a href="{% url 'blog' %}">Blog</a>
+        <a href="{% url 'contactme' %}">Contact</a>
+    </nav>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+</header>
+{% block page_title %}{% endblock page_title %}
+{% block page_content %}{% endblock page_content %}
+</body>
+</html>
