@@ -22,8 +22,8 @@ body {
 
 header {
     text-align: center;
-    padding: 60px 0;
     background-color: var(--header-bg-color);
+    padding: 30px;
     border-bottom: 1px solid var(--border-color);
 }
 
@@ -40,22 +40,30 @@ header p {
 }
 
 header#navbar {
-    display: flex;
     justify-content: space-between;
-    align-items: flex-start;
-    padding: 10px 10px;
+    align-items: center;
+    align-content: center;
+    padding: 20px 0;
     background-color: var(--header-bg-color);
     color: var(--text-color);
 }
 
-nav > a {
+nav {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+nav a {
     color: var(--text-color);
     text-decoration: none;
     margin: 0 10px;
 }
 
 nav > a:hover {
-    text-decoration: underline;
+    color: var(--secondary-text-color);
+    transform: translateY(-5px);
+    transition: 0.3s;
 }
 
 #site-name {
@@ -66,7 +74,9 @@ nav > a:hover {
 }
 
 section {
-    padding: 50px 15%;
+    padding: 50px 10%;
+    flex-wrap: wrap;
+    justify-content: space-between;
 }
 
 section h2 {
@@ -159,17 +169,18 @@ a:hover {
 
 
 #projects {
-    display: list-item;
     justify-content: space-between;
 }
 
 .project {
     background-color: var(--header-bg-color);
-    width: 48%;
+    width: 30%;
     padding: 20px;
-    margin-bottom: 30px;
+    margin: 10px;
     border-radius: 8px;
     transition: transform 0.3s;
+    min-width: 200px;
+    flex: 1 1 25%;
 }
 
 .project:hover {
@@ -184,12 +195,48 @@ a:hover {
 }
 
 .project p {
+    margin: 0;
     color: var(--text-color);
     font-size: 1em;
 }
 
-.projectContainer {
+.flexwrap-container {
     display: flex;
     gap: normal;
-    justify-content: space-between;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+}
+
+.info-list {
+    background-color: var(--header-bg-color);
+    width: 250px;
+    padding: 20px;
+    margin-bottom: 30px;
+    border-radius: 8px;
+    transition: transform 0.3s;
+    text-align: center;
+    /*display: inline-grid;*/
+    flex: 0 1 25%;
+    min-width: 250px;
+}
+
+.info-list h3 {
+    margin-top: 0;
+    font-size: 1.2em;
+    color: var(--secondary-text-color);
+    align-content: center;
+}
+
+.info-list a {
+    color: var(--text-color);
+    margin: 0 auto;
+    padding: 0;
+    display: grid;
+    font-size: 1em;
+}
+
+.info-list a:hover {
+    color: var(--secondary-text-color);
+    transform: translateY(-1px);
+    transition: 0.3s;
 }
