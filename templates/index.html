@@ -9,21 +9,69 @@
         <h1>Matthew Levin</h1>
         <p>Full Stack Developer</p>
     </header>
-    {% block about_me %}
-    {% endblock about_me%}
+    <section id="about">
+        <h2>About Me</h2>
+        <p>Hi, I'm Matt. And I'm a Full-stack web developer and QA automation</p>
+        <p>specialist currently working for
+            <a href="https://www.nextech.com" target="_blank" rel="noopener">Nextech Systems</a>&nbsp;and studying
+            Computer Science at
+            <a href="https://loyno.edu">Loyola University New Orleans</a>.&nbsp;
+        </p>
+        <div class="flexwrap-container">
+        <div class="info-list">
+            <h3>Languages I know how to use</h3>
+            <a href="https://www.youtube.com/watch?v=U3aXWizDbQ4">C</a>
+            <a href="https://www.youtube.com/watch?v=ravLFzIguCM">C#</a>
+            <a href="https://www.youtube.com/watch?v=MNeX4EGtR5Y">C++</a>
+            <a href="https://www.youtube.com/watch?v=l9AzO1FMgM8">Java</a>
+            <a href="https://www.youtube.com/watch?v=x7X9w_GIm1s">Python</a>
+            <a href="https://www.youtube.com/watch?v=DHjqpvDnNGE">Javascript</a>
+            <a href="https://www.youtube.com/watch?v=zQnBQ4tB3ZA">Typescript</a>
+            <a href="https://www.youtube.com/watch?v=zsjvFFKOm3c">SQL</a>
+            <a href="https://www.youtube.com/watch?v=446E-r0rXHI">GO</a>
+        </div>
+        <div class="info-list">
+            <h3>Frameworks/Technologies I know how to use</h3>
+            <a href="https://www.djangoproject.com">Django</a>
+            <a href="https://angular.dev">Angular</a>
+            <a href="https://rxjs.dev">RxJS</a>
+            <a href="https://www.selenium.dev">Selenium</a>
+            <a href="https://junit.org/junit5/">JUnit</a>
+            <a href="https://nunit.org">NUnit</a>
+            <a href="https://jasmine.github.io">Jasmine</a>
+            <a href="https://www.microsoft.com/en-us/sql-server/sql-server-downloads">SqlServer</a>
+            <a href="https://www.postgresql.org">PostgresSQL</a>
+            <a href="https://www.oracle.com/database/">OracleDB</a>
+        </div>
+        <div class="info-list">
+            <h3>I'm a big fan of</h3>
+            <a href="https://www.reddit.com/r/programming/">Programming</a>
+            <a href="https://www.reddit.com/r/unixporn/">Linux/Unix Ricing</a>
+            <a href="https://www.scouting.org">Scouting (Yes I am an Eagle Scout)</a>
+            <a href="https://www.philmontscoutranch.org">Backpacking</a>
+            <a href="https://www.space.com">Space</a>
+            <a href="https://www.starwars.com">Star Wars</a>
+            <a href="https://en.wikipedia.org/wiki/Dune_(novel)">Dune</a>
+            <a href="https://tidal.com/browse/playlist/3e0fd792-b984-49f7-bd62-14c6b50ef821">Hifi Music</a>
+        </div>
+        </div>
+
+
+    </section>
     {% block git_graph %}
     {% endblock %}
     <section id="projects">
         <h2>Projects</h2>
         {% block projects %}
+            <div class="flexwrap-container">
             {% for project in projects %}
                 <div class="project">
                     <h3>{{ project.title }}</h3>
-                    <p>Description of project one.</p>
+                    <p>{{ project.body|slice:":400" }}... <a href="{% url 'blog_detail' project.pk %}" class="read-more">Read more</a></p>
                 </div>
             {% endfor %}
-        {% endblock projects%}
-
+            </div>
+        {% endblock projects %}
     </section>
     <section id="contact">
         <h2>Contact</h2>
