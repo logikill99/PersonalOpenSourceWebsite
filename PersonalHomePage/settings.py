@@ -15,10 +15,9 @@ from dotenv import load_dotenv
 from os import getenv as env
 import phonenumber_field
 
-load_dotenv() # Load environment variables from .env file
+load_dotenv()  # Load environment variables from .env file
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
@@ -29,9 +28,9 @@ SECRET_KEY = env('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env('DEBUG')
 
-EMAIL_HOST_USER = env('EMAIL_HOST_USER') #email-id from which the mail will be sent
+EMAIL_HOST_USER = env('EMAIL_HOST_USER')  # email address that will be used to send emails (should be a gmail account)
 
-EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD') #password of the email-id
+EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')  # password of the email-id
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
@@ -43,11 +42,19 @@ EMAIL_PORT = 587
 
 REGION = 'US'
 
+LISTED_EMAIL = env('LISTED_EMAIL')  # email that will be listed on the home page
 
+LISTED_PHONE = env('LISTED_PHONE')  # phone number that will be listed on the home page
 
+LISTED_GITHUB = env('LISTED_GITHUB')  # github link
+
+LISTED_LINKEDIN = env('LISTED_LINKEDIN')  # linkedin link
+
+LISTED_TWITTER = env('LISTED_TWITTER')  # twitter link
+
+LISTED_DISCORD = env('LISTED_DISCORD')  # discord link
 
 ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -97,7 +104,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'PersonalHomePage.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
@@ -107,7 +113,6 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -127,7 +132,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
@@ -138,7 +142,6 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
