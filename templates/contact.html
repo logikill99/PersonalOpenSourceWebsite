@@ -1,14 +1,16 @@
 <!-- templates/contact.html -->
 {% extends "base.html" %}
+
+{% block page_title %}
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Contact Me</title>
+    </head>
+{% endblock %}
+
 {% block page_content %}
-    
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact Me</title>
-</head>
-<body>
-    <header>
+    <header class="page-header">
         <h1>Contact Me</h1>
     </header>
     <section id="contact">
@@ -19,6 +21,4 @@
             <button type="submit">Submit</button>
         </form>
     </section>
-</body>
-</html>
 {% endblock %}

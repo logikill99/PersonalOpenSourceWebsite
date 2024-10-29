@@ -20,7 +20,7 @@ body {
     font-family: 'Roboto', sans-serif;
 }
 
-header {
+.page-header {
     text-align: center;
     background-color: var(--header-bg-color);
     padding: 30px;
@@ -46,7 +46,6 @@ header p {
 }
 
 header#navbar {
-    justify-content: space-between;
     align-items: center;
     align-content: center;
     padding: 20px 0;
@@ -68,15 +67,8 @@ nav a {
 
 nav > a:hover {
     color: var(--secondary-text-color);
-    transform: translateY(-5px);
+    transform: translateY(-3px);
     transition: 0.3s;
-}
-
-#site-name {
-    font-weight: 700;
-    padding-left: 20px;
-    font-size: 1.5rem;
-    color: var(--header-text-color);
 }
 
 section {
@@ -143,20 +135,6 @@ a {
 
 #contact a:hover {
     background-color: var(--background-color);
-}
-
-@media (max-width: 768px) {
-    section {
-        padding: 30px 10%;
-    }
-
-    .projectContainer {
-        flex-direction: column;
-    }
-
-    .project {
-        width: 100%;
-    }
 }
 
 
@@ -312,4 +290,8 @@ button:hover {
     background-color: var(--header-bg-color);
     color: var(--secondary-text-color);
     transition: background-color 0.3s;
+}
+
+body {
+    overflow-y: scroll;
 }

@@ -46,7 +46,6 @@ header p {
 }
 
 header#navbar {
-    justify-content: space-between;
     align-items: center;
     align-content: center;
     padding: 20px 0;
@@ -143,20 +142,6 @@ a {
 
 #contact a:hover {
     background-color: var(--background-color);
-}
-
-@media (max-width: 768px) {
-    section {
-        padding: 30px 10%;
-    }
-
-    .projectContainer {
-        flex-direction: column;
-    }
-
-    .project {
-        width: 100%;
-    }
 }
 
 
@@ -286,8 +271,20 @@ h3 {
     border: 1px solid var(--border-color);
 }
 
+input {
+    background: var(--accent-color);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+}
 
-.btn-primary {
+textarea {
+    background: var(--accent-color);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+}
+
+
+button {
     background-color: var(--accent-color);
     color: var(--text-color);
     border: 1px solid var(--border-color);
@@ -296,7 +293,7 @@ h3 {
     transition: background-color 0.3s;
 }
 
-.btn-primary:hover {
+button:hover {
     background-color: var(--header-bg-color);
     color: var(--secondary-text-color);
     transition: background-color 0.3s;
