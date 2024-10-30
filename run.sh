@@ -1,2 +1,2 @@
-docker build -t "python" --no-cache -f "./Dockerfile" .
-docker run -it --rm --name "djapp" python:3.13.0-alpine "python"
+docker build -t djapp -f ./Dockerfile .
+docker run -t -p 8000:8000 --name "PersonalHomePage" djapp
