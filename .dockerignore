@@ -1,0 +1,9 @@
+.dockerignore
+.venv
+.idea
+.gitignore
+package.json
+package-lock.json
+pyrightconfig.json
+run.sh
+node_modules

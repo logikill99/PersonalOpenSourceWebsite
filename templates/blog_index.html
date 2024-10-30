@@ -7,11 +7,11 @@
     <h2>Blog Posts</h2>
     {% if posts %}
         {% for post in posts %}
-          <article class="post">
-             <h3><a href="{% url 'blog_detail' post.pk %}">{{ post.title }}</a></h3>
-             <small class="post-date">{{ post.created_on.date }}</small>
-             <p>{{ post.body|slice:":400" }}... <a href="{% url 'blog_detail' post.pk %}" class="read-more">Read more</a></p>
-          <article/>
+            <article class="post">
+                <h3><a href="{% url 'blog_detail' post.pk %}">{{ post.title }}</a></h3>
+                <small class="post-date">{{ post.created_on.date }}</small>
+                <p>{{ post.body|slice:":400" }}... <a href="{% url 'blog_detail' post.pk %}" class="read-more">Read more</a></p>
+            </article>
         {% endfor %}
     {% else %}
         <p>No posts available.</p>
