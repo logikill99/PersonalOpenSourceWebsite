@@ -9,3 +9,4 @@ urlpatterns = [
     path("contactme/", contact_view, name="contactme"),
     path("blog/", blog_index, name="blog"),
 ]
+# TODO: add about me/resume page

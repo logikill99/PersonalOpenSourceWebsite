@@ -1,5 +1,6 @@
 from django.db import models
 
+
 # Create your models here.
 class Category(models.Model):
     name = models.CharField(max_length=30)
@@ -30,3 +31,6 @@ class Comment(models.Model):
 
     def __str__(self):
         return f"{self.author} on '{self.post}'"
+
+
+# TODO: add model for images
