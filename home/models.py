@@ -11,7 +11,7 @@ class Skill(models.Model):
     proficiency = models.CharField(max_length=30)
     description = models.TextField()
     type = models.CharField(max_length=15)
-    link = models.URLField()
+    url = models.URLField()
 
     def __str__(self):
         return self.name
@@ -26,9 +26,7 @@ class Experience(models.Model):
     description = models.TextField()
     type = models.CharField(max_length=15)
     skills = models.ManyToManyField("Skill")
-    link = models.URLField()
+    url = models.URLField()
 
     def __str__(self):
         return self.title
-
-# TODO: add models for skills, education experience, work experience

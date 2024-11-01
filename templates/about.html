@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+
+{% block page_content %}
+    <section id="about">
+        <h2>About Me</h2>
+        <p>Hi, I'm Matt. And I'm a Full-stack web developer and QA automation</p>
+        <p>specialist currently working for
+            <a class="interactive-text" href="https://www.nextech.com" target="_blank" rel="noopener">Nextech Systems</a>&nbsp;and studying
+            Computer Science at
+            <a class="interactive-text" href="https://loyno.edu">Loyola University New Orleans</a>.&nbsp;
+        </p>
+        <h2>Work experience</h2>
+        {% for work in work_experiences %}
+            <div class="experience">
+                <small>{{ work.start_date }} - {% if work.current %}Present{% else %} {{ work.end_date }} {% endif %} </small>
+                <br>
+                <strong class="experience-title">{{ work.title }}</strong> - 
+                <a class="interactive-text" href="{{ work.url }}">{{ work.organization }}</a>
+                <div class="experience-description">{{ work.description | linebreaks}}</div>
+            </div>
+        {% endfor %}
+        <h2>Education</h2>
+            {% for education in education_experiences %}
+                <div class="experience">
+                    <small>{{ education.start_date }} - {% if education.current %}Present{% else %} {{ education.end_date }} {% endif %} </small>
+                    <br> 
+                    <strong class="experience-title">{{ education.title }}</strong>
+                    <a class="interactive-text" href="{{ education.url }}">{{ education.organization }}</a>
+                    <div class="experience-description">{{ education.description | linebreaks}}</div>
+                </div>
+            {% endfor %}
+        <div class="flexwrap-container">
+            <div class="skills-list-language">
+                <h3>Languages I know how to use</h3>
+                {% for language in languages %}
+                    <a class="tskills-list-item" href="{{ language.url }}">{{ language.name }}
+                    </a>
+                {% endfor %}
+            </div>
+            <div class="skills-list-framework">
+                <h3>Frameworks/Technologies I know how to use</h3>
+                {% for framework in frameworks %}
+                    <a class="skills-list-item" href="{{ framework.url }}">{{ framework.name }}
+                    </a>
+                {% endfor %}
+            </div>
+            <div class="skill-list-hobby">
+                <h3>I'm a big fan of</h3>
+                {% for hobby in hobbies %}
+                    <a class="tooltip interactive-text" href="{{ hobby.url }}">{{ hobby.name }}
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+
+    </section>
+
+{% endblock%}

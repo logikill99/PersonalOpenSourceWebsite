@@ -8,5 +8,7 @@ urlpatterns = [
     path("", views.home, name="home"),
     path("contactme/", contact_view, name="contactme"),
     path("blog/", blog_index, name="blog"),
+    path("about/", views.about, name="about"),
 ]
 # TODO: add about me/resume page
+# TODO: add uses page
