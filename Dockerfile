@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY . /app
 RUN apk add --no-cache sqlite
-RUN pip3 install django python-dotenv "django-phonenumber-field[phonenumbers]"
+RUN pip3 install django python-dotenv "django-phonenumber-field[phonenumbers]" pillow
 RUN ls -a
 RUN pwd
 ENV PYTHONUNBUFFERED=1

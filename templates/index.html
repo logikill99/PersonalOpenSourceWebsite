@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 
+{% load static %}
 {% block page_title %}
     <head>
         <meta charset="UTF-8">
@@ -9,6 +10,9 @@
 {% endblock %}
 
 {% block page_content %}
+    <script src="https://code.jquery.com/jquery-3.7.1.js"
+            integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+    <script src="{% static 'expand.js' %}"></script>
     <header class="page-header">
     {# TODO: add images to header or about section#}
         <h1>Matthew Levin</h1>
@@ -26,63 +30,39 @@
     </header>
     <section id="about">
         <h2>About Me</h2>
-        <p>Hi, I'm Matt. And I'm a Full-stack web developer and QA automation</p>
-        <p>specialist currently working for
-            <a class="interactive-text" href="https://www.nextech.com" target="_blank" rel="noopener">Nextech Systems</a>&nbsp;and studying
-            Computer Science at
-            <a class="interactive-text" href="https://loyno.edu">Loyola University New Orleans</a>.&nbsp;
-        </p>
-        <div class="flexwrap-container">
-            <div class="info-list">
-                <h3>Languages I know how to use</h3>
-                {% for language in languages %}
-                    <a class="tooltip" href="{{ language.url }}">{{ language.name }}
-                        <div class="right">
-                            <p>Click here to see more about {{ language.name }}</p>
-                            <i></i>
-                        </div>
-                    </a>
+        <div class="container">
+        <div id="about-me-images">
+            <img src="{% static '1.jpg' %}" alt="Paul Atraides">
+        </div>
+        <div class="about-me-text">
+            <p>Hi, I'm Matt. I'm a Full-stack web developer and QA automation specialist currently working for
+                <a class="interactive-text" href="https://www.nextech.com" target="_blank" rel="noopener">Nextech Systems</a>&nbsp;and studying
+                Computer Science at
+                <a class="interactive-text" href="https://loyno.edu">Loyola University New Orleans</a>.&nbsp where I am set to graduate in December 2024 with a 3.74 GPA.
+                I specialize in
+            </p>
+                <div class="skills-list">
+                {% for skill in highlighted_skills %}
+                    <div class="skill-button">
+                        <a class="btn btn-default skills-list-item show-info">
+                            {{ skill.name }}
+                            <div class="info">{{ skill.description }}</div>
+                        </a>
+                    </div>
                 {% endfor %}
-            </div>
-            <div class="info-list">
-                <h3>Frameworks/Technologies I know how to use</h3>
-                {% for framework in frameworks %}
-                    <a class="tooltip" href="{{ framework.url }}">{{ framework.name }}
-                        <div class="right">
-                            <p>Click here to see more about {{ framework.name }}</p>
-                            <i></i>
-                        </div>
-                    </a>
-                {% endfor %}
-            </div>
-            <div class="info-list">
-                <h3>I'm a big fan of</h3>
-                {% for hobby in hobbies %}
-                    <a class="tooltip" href="{{ hobby.url }}">{{ hobby.name }}
-                        <div class="right">
-                            <p>Click here to see more about {{ hobby.name }}</p>
-                            <i></i>
-                        </div>
-                    </a>
-                {% endfor %}
+                </div>
             </div>
         </div>
-
-
     </section>
-    {% block git_graph %}
-    {% endblock %}
     <section id="projects">
         <h2>Projects</h2>
         {% block projects %}
             <div class="flexwrap-container">
             {% for project in projects %}
-                <a href="{% url 'blog_detail' project.pk %}">
-                    <div class="project">
-                        <h3>{{ project.title }}</h3>
-                        <p>{{ project.body|slice:":400" }}... <a href="{% url 'blog_detail' project.pk %}" class="interactive-text">Read more</a></p>
-                    </div>
-                </a>
+                <div class="project">
+                    <h3>{{ project.title }}</h3><p>{{ project.body|slice:":400" }}... <a href="{% url 'blog_detail' project.pk %}" class="interactive-text">Read more</a></p>
+                    <a class="clickable-div"  href="{% url 'blog_detail' project.pk %}"></a>
+                </div>
             {% endfor %}
             </div>
         {% endblock projects %}

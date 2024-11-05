@@ -34,3 +34,9 @@ class Comment(models.Model):
 
 
 # TODO: add model for images
+class Image(models.Model):
+    image = models.ImageField(upload_to='images/')
+    post = models.ForeignKey("Post", on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.image} on '{self.post}'"
