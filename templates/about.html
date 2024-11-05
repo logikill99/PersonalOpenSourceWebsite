@@ -1,59 +1,105 @@
 {% extends "base.html" %}
-
+{% load static %}
 
 {% block page_content %}
+    <script src="https://code.jquery.com/jquery-3.7.1.js"
+            integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+    <script src="{% static 'expand.js' %}"></script>
     <section id="about">
         <h2>About Me</h2>
         <p>Hi, I'm Matt. And I'm a Full-stack web developer and QA automation</p>
         <p>specialist currently working for
-            <a class="interactive-text" href="https://www.nextech.com" target="_blank" rel="noopener">Nextech Systems</a>&nbsp;and studying
+            <a class="interactive-text" href="https://www.nextech.com" target="_blank" rel="noopener">Nextech
+                Systems</a>&nbsp;and studying
             Computer Science at
             <a class="interactive-text" href="https://loyno.edu">Loyola University New Orleans</a>.&nbsp;
         </p>
         <h2>Work experience</h2>
         {% for work in work_experiences %}
             <div class="experience">
-                <small>{{ work.start_date }} - {% if work.current %}Present{% else %} {{ work.end_date }} {% endif %} </small>
+                <small>{{ work.start_date }} - {% if work.current %}Present{% else %}
+                    {{ work.end_date }} {% endif %} </small>
                 <br>
-                <strong class="experience-title">{{ work.title }}</strong> - 
+                <strong class="experience-title">{{ work.title }}</strong> -
                 <a class="interactive-text" href="{{ work.url }}">{{ work.organization }}</a>
-                <div class="experience-description">{{ work.description | linebreaks}}</div>
+                <div class="experience-description">{{ work.description | linebreaks }}</div>
+                <div class="experience-skills">
+                    {% for skill in work.skills.all %}
+                        <div class="skill-button">
+                            <a class="btn btn-default skills-list-item show-info">
+                                {{ skill.name }}
+                                <div class="info">{{ skill.description }}</div>
+                            </a>
+                        </div>
+                    {% endfor %}
+                </div>
             </div>
         {% endfor %}
         <h2>Education</h2>
-            {% for education in education_experiences %}
-                <div class="experience">
-                    <small>{{ education.start_date }} - {% if education.current %}Present{% else %} {{ education.end_date }} {% endif %} </small>
-                    <br> 
-                    <strong class="experience-title">{{ education.title }}</strong>
-                    <a class="interactive-text" href="{{ education.url }}">{{ education.organization }}</a>
-                    <div class="experience-description">{{ education.description | linebreaks}}</div>
+        {% for education in education_experiences %}
+            <div class="experience">
+                <small>{{ education.start_date }} - {% if education.current %}Present{% else %}
+                    {{ education.end_date }} {% endif %} </small>
+                <br>
+                <strong class="experience-title">{{ education.title }}</strong>
+                <a class="interactive-text" href="{{ education.url }}">{{ education.organization }}</a>
+                <div class="experience-description">{{ education.description | linebreaks }}</div>
+                <div class="experience-skills">
+                    {% for skill in education.skills.all %}
+                        <div class="skill-button">
+                            <a class="btn btn-default skills-list-item show-info">
+                                {{ skill.name }}
+                                <div class="info">{{ skill.description }}</div>
+                            </a>
+                        </div>
+                    {% endfor %}
                 </div>
-            {% endfor %}
-        <div class="flexwrap-container">
-            <div class="skills-list-language">
-                <h3>Languages I know how to use</h3>
-                {% for language in languages %}
-                    <a class="tskills-list-item" href="{{ language.url }}">{{ language.name }}
-                    </a>
+            </div>
+        {% endfor %}
+        <h2>Skills</h2>
+        <div class="experience-skills-list">
+            <h3>Languages I know how to use</h3>
+            <div class="skills-list">
+                {% for skill in languages %}
+                    <div class="skill-button">
+                        <a class="btn btn-default skills-list-item show-info">
+                            {{ skill.name }}
+                            <div class="info">{{ skill.description }}
+                                <a class="small-interactive-text" href="{{ skill.url }}">Learn More</a>
+                            </div>
+                        </a>
+                    </div>
                 {% endfor %}
             </div>
-            <div class="skills-list-framework">
-                <h3>Frameworks/Technologies I know how to use</h3>
-                {% for framework in frameworks %}
-                    <a class="skills-list-item" href="{{ framework.url }}">{{ framework.name }}
-                    </a>
+            <h3>Frameworks Databases and other Things I know how to use</h3>
+            <div class="skills-list">
+                {% for skill in frameworks %}
+                    <div class="skill-button">
+                        <a class="btn btn-default skills-list-item show-info">
+                            {{ skill.name }}
+                            <div class="info">{{ skill.description }}
+                                <a class="small-interactive-text" href="{{ skill.url }}">Learn More</a>
+                            </div>
+                        </a>
+                    </div>
                 {% endfor %}
             </div>
-            <div class="skill-list-hobby">
-                <h3>I'm a big fan of</h3>
-                {% for hobby in hobbies %}
-                    <a class="tooltip interactive-text" href="{{ hobby.url }}">{{ hobby.name }}
-                    </a>
+            <h3>Hobbies and things I'm interested in</h3>
+            <div class="skills-list">
+                {% for skill in hobbies %}
+                    <div class="skill-button">
+                        <a class="btn btn-default skills-list-item show-info">
+                            {{ skill.name }}
+                            <div class="info">{{ skill.description }} 
+                                <a class="interactive-text" href="{{ skill.url }}">Learn More</a>
+                            </div>
+
+                        </a>
+                    </div>
                 {% endfor %}
             </div>
         </div>
-
     </section>
 
-{% endblock%}
+
+{% endblock %}
