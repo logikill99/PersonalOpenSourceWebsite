@@ -133,3 +133,7 @@ python3 manage.py runserver
 ```
 Follow the prompts to create a superuser (this is what you will use to login to the /admin area)
 If all the dependencies are installed correctly this should work regardless of operating system. 
+
+then you can go to `localhost:8000` in your browser and everything should be set!
+
+if you want to add stuff to the database go to `localhost:8000/admin` and login with the credentials you made for the superuser
