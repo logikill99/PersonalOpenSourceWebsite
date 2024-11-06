@@ -4,7 +4,8 @@ This is the source code for my personal portfolio website that is written in Dja
 it is meant to be a very drop in solution for anyone else who wants to use it or modify it. 
 
 This website can be run in a docker container, or locally without docker. 
-**Running with Docker is easier unless you are making changes to the code and is recommended for beginners**
+
+_**Running with Docker is easier unless you are making changes to the code and is recommended for beginners**_
 
 # Installation
 
