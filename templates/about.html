@@ -17,8 +17,8 @@
         <h2>Work experience</h2>
         {% for work in work_experiences %}
             <div class="experience">
-                <small>{{ work.start_date }} - {% if work.current %}Present{% else %}
-                    {{ work.end_date }} {% endif %} </small>
+                <small>{{ work.start_date|date:"M Y" }} - {% if work.current %}Present{% else %}
+                    {{ work.end_date|date:"M Y" }} {% endif %} </small>
                 <br>
                 <strong class="experience-title">{{ work.title }}</strong> -
                 <a class="interactive-text" href="{{ work.url }}">{{ work.organization }}</a>
@@ -38,8 +38,8 @@
         <h2>Education</h2>
         {% for education in education_experiences %}
             <div class="experience">
-                <small>{{ education.start_date }} - {% if education.current %}Present{% else %}
-                    {{ education.end_date }} {% endif %} </small>
+                <small>{{ education.start_date|date:"M Y" }} - {% if education.current %}Present{% else %}
+                    {{ education.end_date|date:"M Y"}} {% endif %} </small>
                 <br>
                 <strong class="experience-title">{{ education.title }}</strong>
                 <a class="interactive-text" href="{{ education.url }}">{{ education.organization }}</a>
