@@ -3,19 +3,29 @@
 This is the source code for my personal portfolio website that is written in Django (soon to be deployed on mslevin.dev).
 it is meant to be a very drop in solution for anyone else who wants to use it or modify it. 
 
+This website can be run in a docker container, or locally without docker. 
+**Running with Docker is easier unless you are making changes to the code and is recommended for beginners**
+
 # Installation
 
-**Dependencies**: Docker Git SQLite3
+**Dependencies:** Docker, Git, SQLite3
+
+**Clone the repo with:** ```git clone https://github.com/logikill99/PersonalOpenSourceWebsite.git```
 
 **If you are running it locally not in a docker container:**
+
 Python 3.10 or above
+
 Django 5.1.0 or above
+
 django-phonenumber-field
+
 pillow for python
+
 python-dotenv
 
 
-or you can just run:
+or if you want to run the website without docker you can just run:
 ```pip3 install -r requirements.txt```
 
 # Running
