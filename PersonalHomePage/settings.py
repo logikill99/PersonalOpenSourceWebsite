@@ -28,6 +28,10 @@ SECRET_KEY = env('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env('DEBUG')
 
+ADMINS = [(env('ADMIN_NAME'), env('ADMIN_EMAIL'))]
+
+ALLOWED_HOSTS = [env('ALLOWED_HOSTS')]
+
 EMAIL_HOST_USER = env('EMAIL_HOST_USER')  # email address that will be used to send emails (should be a gmail account)
 
 EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')  # password of the email-id
@@ -156,3 +160,7 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+CSRF_COOKIE_SECURE = True
+
+SESSION_COOKIE_SECURE = True
