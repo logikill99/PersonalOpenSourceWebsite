@@ -371,12 +371,11 @@ body {
     padding-left: 30px;
     padding-right: 30px;
     padding-bottom: 10px;
-    margin: 1px;
+    margin-bottom: 20px;
     border-radius: 8px;
     transition: transform 0.3s;
     min-width: 200px;
     flex: 1 1 25%;
-    /*max-width: calc(90% - 100px);*/
 }
 
 .experience:hover {
@@ -405,6 +404,7 @@ body {
     flex: 0 0 auto;
     justify-content: left;
     text-overflow: ellipsis;
+    min-width: fit-content;
 }
 
 .skill-button > a > div {
@@ -449,6 +449,8 @@ body {
 
 #about-me-text {
     max-width: calc(70% - 100px);
+    min-width: 500px;
+    flex-wrap: wrap;
 }
 
 #about-me-images {
@@ -470,10 +472,13 @@ body {
     justify-content: space-between;
     align-items: center;
     grid-template-columns: 1fr 1fr;
+    flex-wrap: wrap;
 }
 
 #about-me-images > img {
     max-width: 500px;
     max-height: 500px;
     border-radius: 8px;
+    margin: 20px;
 }
+

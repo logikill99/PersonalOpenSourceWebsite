@@ -8,6 +8,8 @@ from PersonalHomePage.settings import (
     LISTED_LINKEDIN,
     LISTED_TWITTER,
     LISTED_DISCORD,
+    LISTED_NAME,
+    LISTED_TITLE,
 )
 from home.models import Experience, Skill
 
@@ -34,6 +36,8 @@ def home(request):
             "twitter": LISTED_TWITTER,
             "discord": LISTED_DISCORD,
             "email": LISTED_EMAIL,
+            "name": LISTED_NAME,
+            "title": LISTED_TITLE,
         },
     )
 

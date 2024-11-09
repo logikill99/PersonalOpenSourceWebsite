@@ -42,6 +42,10 @@ EMAIL_PORT = 587
 
 REGION = 'US'
 
+LISTED_NAME = env('LISTED_NAME')  # name that will be listed on the home page
+
+LISTED_TITLE = env('LISTED_TITLE')  # title that will be listed on the home page
+
 LISTED_EMAIL = env('LISTED_EMAIL')  # email that will be listed on the home page
 
 LISTED_PHONE = env('LISTED_PHONE')  # phone number that will be listed on the home page
