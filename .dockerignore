@@ -7,3 +7,4 @@ package-lock.json
 pyrightconfig.json
 run.sh
 node_modules
+Dockerfile

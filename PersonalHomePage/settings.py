@@ -28,6 +28,10 @@ SECRET_KEY = env('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env('DEBUG')
 
+ADMINS = [(env('ADMIN_NAME'), env('ADMIN_EMAIL'))]
+
+ALLOWED_HOSTS = [env('ALLOWED_HOSTS')]
+
 EMAIL_HOST_USER = env('EMAIL_HOST_USER')  # email address that will be used to send emails (should be a gmail account)
 
 EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')  # password of the email-id
@@ -41,6 +45,10 @@ EMAIL_USE_TLS = True
 EMAIL_PORT = 587
 
 REGION = 'US'
+
+LISTED_NAME = env('LISTED_NAME')  # name that will be listed on the home page
+
+LISTED_TITLE = env('LISTED_TITLE')  # title that will be listed on the home page
 
 LISTED_EMAIL = env('LISTED_EMAIL')  # email that will be listed on the home page
 
@@ -152,3 +160,7 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+CSRF_COOKIE_SECURE = True
+
+SESSION_COOKIE_SECURE = True
