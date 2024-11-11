@@ -24,6 +24,7 @@ body {
     text-align: center;
     background-color: var(--header-bg-color);
     padding: 30px;
+    padding-top: 20px;
     border-bottom: 1px solid var(--border-color);
 }
 
@@ -36,7 +37,7 @@ header h1 {
 h2 {
     font-size: 2em;
     margin: 0;
-    padding-top: 50px;
+    padding-top: 40px;
     color: var(--header-text-color);
 }
 
@@ -145,13 +146,25 @@ a {
 
 .project {
     background-color: var(--header-bg-color);
-    width: 30%;
+    width: calc(33.333% - 20px);
     padding: 20px;
     margin: 10px;
     border-radius: 8px;
     transition: transform 0.3s;
     min-width: 200px;
     flex: 1 1 25%;
+}
+
+@media only screen and (max-width: 768px) {
+    .project {
+        width: 48%;
+    }
+}
+
+@media only screen and (max-width: 480px) {
+    .project {
+        width: 100%;
+    }
 }
 
 .project:hover {
@@ -235,14 +248,6 @@ a {
     border-radius: 5px;
     transition: background-color 0.3s;
 }
-
-/*.info {*/
-/*    color: var(--text-color);*/
-/*    text-decoration: AccentColor;*/
-/*    font-size: 0.8em;*/
-/*    text-wrap: wrap;*/
-/*    transition: 0.3s;*/
-/*}*/
 
 .interactive-text {
     color: var(--text-color);
@@ -469,16 +474,77 @@ body {
 
 .container {
     display: grid;
-    justify-content: space-between;
-    align-items: center;
     grid-template-columns: 1fr 1fr;
-    flex-wrap: wrap;
+    gap: 20px;
+    align-items: center;
+}
+
+@media only screen and (max-width: 720px) {
+    .container {
+        grid-template-columns: 1fr;
+    }
 }
 
 #about-me-images > img {
-    max-width: 500px;
-    max-height: 500px;
+    max-width: 33vw;
     border-radius: 8px;
     margin: 20px;
 }
 
+/* Existing CSS... */
+
+@media only screen and (max-width: 720px) {
+    /* Adjust font sizes for smaller screens */
+    header h1 {
+        font-size: 2em;
+    }
+
+    h2 {
+        font-size: 1.5em;
+    }
+
+    header p {
+        font-size: 1.2em;
+    }
+
+    /* Stack navigation items vertically */
+    nav {
+        flex-direction: column;
+    }
+
+    nav a {
+        margin: 5px 0;
+    }
+
+    /* Reduce padding in sections */
+    section {
+        padding: 20px 5%;
+    }
+
+    /* Adjust project cards to fit smaller screens */
+    .project {
+        width: 100%;
+        margin: 10px 10px;
+    }
+
+    /* Adjust experience section */
+    .experience {
+        width: calc(100% - 60px);
+    }
+
+    .experience:hover {
+        transform: translateY(-10px);
+    }
+
+    /* Adjust image sizing */
+    #about-me-images > img {
+        max-width: calc(100vw - 60px);
+        margin: 0 0;
+        padding: 0 0;
+    }
+
+    /* Stack container elements */
+    .container {
+        grid-template-columns: 1fr;
+    }
+}

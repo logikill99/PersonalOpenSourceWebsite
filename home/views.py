@@ -57,6 +57,7 @@ def about(request):
     languages = Skill.objects.filter(type="language")
     frameworks = Skill.objects.filter(type="framework")
     hobbies = Skill.objects.filter(type="hobby")
+    other_skills = Skill.objects.filter(type="other")
 
     return render(
         request,
@@ -65,6 +66,7 @@ def about(request):
             "projects": projects,
             "languages": languages,
             "frameworks": frameworks,
+            "other_skills": other_skills,
             "hobbies": hobbies,
             "education_experiences": education_experiences,
             "work_experiences": work_experiences,

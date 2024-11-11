@@ -1,13 +1,6 @@
-<!-- templates/contact_success.html -->
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact Success</title>
-    <link rel="stylesheet" href="{% static 'style.css' %}">
-</head>
+{% extends 'base.html' %}
+
+{% block page_content %}
 <body>
     <header class="page-header">
         <h1>Thank You!</h1>
@@ -16,4 +9,4 @@
         <p>Your message has been sent successfully.</p>
     </section>
 </body>
-</html>
+{% endblock %}

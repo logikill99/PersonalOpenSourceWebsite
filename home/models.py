@@ -20,12 +20,12 @@ class Skill(models.Model):
 class Experience(models.Model):
     title = models.CharField(max_length=50)
     organization = models.CharField(max_length=50)
-    start_date = models.DateField()
-    end_date = models.DateField()
+    start_date = models.DateField(blank=True)
+    end_date = models.DateField(blank=True)
     current = models.BooleanField()
     description = models.TextField()
     type = models.CharField(max_length=15)
-    skills = models.ManyToManyField("Skill")
+    skills = models.ManyToManyField("Skill", blank=True)
     url = models.URLField()
 
     def __str__(self):
