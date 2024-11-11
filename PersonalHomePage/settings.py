@@ -25,16 +25,17 @@ load_dotenv(path.join(BASE_DIR, '.env'))
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = env('SECRET_KEY')
+SECRET_KEY = str(env('SECRET_KEY'))
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = bool(env('DEBUG'))
 
-ADMINS = [(env('ADMIN_NAME'), env('ADMIN_EMAIL'))]
+ADMINS = [(str(env('ADMIN_NAME')), str(env('ADMIN_EMAIL')))]
 
-EMAIL_HOST_USER = env('EMAIL_HOST_USER')  # email address that will be used to send emails (should be a gmail account)
+EMAIL_HOST_USER = str(
+    env('EMAIL_HOST_USER'))  # email address that will be used to send emails (should be a gmail account)
 
-EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')  # password of the email-id
+EMAIL_HOST_PASSWORD = str(env('EMAIL_HOST_PASSWORD'))  # password of the email-id
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
@@ -46,23 +47,23 @@ EMAIL_PORT = 587
 
 REGION = 'US'
 
-LISTED_NAME = env('LISTED_NAME')  # name that will be listed on the home page
+LISTED_NAME = str(env('LISTED_NAME'))  # name that will be listed on the home page
 
-LISTED_TITLE = env('LISTED_TITLE')  # title that will be listed on the home page
+LISTED_TITLE = str(env('LISTED_TITLE'))  # title that will be listed on the home page
 
-LISTED_EMAIL = env('LISTED_EMAIL')  # email that will be listed on the home page
+LISTED_EMAIL = str(env('LISTED_EMAIL'))  # email that will be listed on the home page
 
-LISTED_PHONE = env('LISTED_PHONE')  # phone number that will be listed on the home page
+LISTED_PHONE = str(env('LISTED_PHONE'))  # phone number that will be listed on the home page
 
-LISTED_GITHUB = env('LISTED_GITHUB')  # github link
+LISTED_GITHUB = str(env('LISTED_GITHUB'))  # github link
 
-LISTED_LINKEDIN = env('LISTED_LINKEDIN')  # linkedin link
+LISTED_LINKEDIN = str(env('LISTED_LINKEDIN'))  # linkedin link
 
-LISTED_TWITTER = env('LISTED_TWITTER')  # twitter link
+LISTED_TWITTER = str(env('LISTED_TWITTER'))  # twitter link
 
-LISTED_DISCORD = env('LISTED_DISCORD')  # discord link
+LISTED_DISCORD = str(env('LISTED_DISCORD'))  # discord link
 
-ALLOWED_HOSTS = [env('ALLOWED_HOSTS')]
+ALLOWED_HOSTS = [str(env('ALLOWED_HOSTS'))]
 
 # Application definition
 
