@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from pathlib import Path
 from dotenv import load_dotenv
 from os import getenv as env
+from os import path
 import phonenumber_field
 
 load_dotenv()  # Load environment variables from .env file
@@ -62,7 +63,7 @@ LISTED_TWITTER = env('LISTED_TWITTER')  # twitter link
 
 LISTED_DISCORD = env('LISTED_DISCORD')  # discord link
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [env('ALLOWED_HOSTS')]
 
 # Application definition
 
