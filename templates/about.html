@@ -12,19 +12,19 @@
             <a class="interactive-text" href="https://www.nextech.com" target="_blank" rel="noopener">Nextech
                 Systems</a>&nbsp;and studying
             Computer Science at
-            <a class="interactive-text" href="https://loyno.edu">Loyola University New Orleans</a>.&nbsp;
+            <a class="interactive-text" href="https://loyno.edu">Loyola University New Orleans</a> where I'm set to graduate in December 2024&nbsp;
         </p>
         <h2>Work experience</h2>
-        {% for work in work_experiences %}
+        {% for experience in work_experiences %}
             <div class="experience">
-                <small>{{ work.start_date|date:"M Y" }} - {% if work.current %}Present{% else %}
-                    {{ work.end_date|date:"M Y" }} {% endif %} </small>
+                <small>{{ experience.start_date|date:"M Y" }} - {% if experience.current %}Present{% else %}
+                    {{ experience.end_date|date:"M Y" }} {% endif %} </small>
                 <br>
-                <strong class="experience-title">{{ work.title }}</strong> -
-                <a class="interactive-text" href="{{ work.url }}">{{ work.organization }}</a>
-                <div class="experience-description">{{ work.description | linebreaks }}</div>
+                <strong class="experience-title">{{ experience.title }}</strong> -
+                <a class="interactive-text" href="{{ experience.url }}">{{ experience.organization }}</a>
+                <div class="experience-description">{{ experience.description | linebreaks }}</div>
                 <div class="experience-skills">
-                    {% for skill in work.skills.all %}
+                    {% for skill in experience.skills.all %}
                         <div class="skill-button">
                             <a class="btn btn-default skills-list-item show-info">
                                 {{ skill.name }}
@@ -36,16 +36,34 @@
             </div>
         {% endfor %}
         <h2>Education</h2>
-        {% for education in education_experiences %}
+        {% for experience in education_experiences %}
             <div class="experience">
-                <small>{{ education.start_date|date:"M Y" }} - {% if education.current %}Present{% else %}
-                    {{ education.end_date|date:"M Y"}} {% endif %} </small>
+                <small>{{ experience.start_date|date:"M Y" }} - {% if experience.current %}Present{% else %}
+                    {{ experience.end_date|date:"M Y"}} {% endif %} </small>
                 <br>
-                <strong class="experience-title">{{ education.title }}</strong>
-                <a class="interactive-text" href="{{ education.url }}">{{ education.organization }}</a>
-                <div class="experience-description">{{ education.description | linebreaks }}</div>
+                <strong class="experience-title">{{ experience.title }}</strong> - 
+                <a class="interactive-text" href="{{ experience.url }}">{{ experience.organization }}</a>
+                <div class="experience-description">{{ experience.description | linebreaks }}</div>
                 <div class="experience-skills">
-                    {% for skill in education.skills.all %}
+                    {% for skill in experience.skills.all %}
+                        <div class="skill-button">
+                            <a class="btn btn-default skills-list-item show-info">
+                                {{ skill.name }}
+                                <div class="info">{{ skill.description }}</div>
+                            </a>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endfor %}
+        <h2>Other Achievements</h2>
+        {% for experience in personal_experiences %}
+            <div class="experience">
+                <strong class="experience-title">{{ experience.title }}</strong> - 
+                <a class="interactive-text" href="{{ experience.url }}">{{ experience.organization }}</a>
+                <div class="experience-description">{{ experience.description | linebreaks }}</div>
+                <div class="experience-skills">
+                    {% for skill in experience.skills.all %}
                         <div class="skill-button">
                             <a class="btn btn-default skills-list-item show-info">
                                 {{ skill.name }}
@@ -74,6 +92,19 @@
             <h3>Frameworks Databases and other Things I know how to use</h3>
             <div class="skills-list">
                 {% for skill in frameworks %}
+                    <div class="skill-button">
+                        <a class="btn btn-default skills-list-item show-info">
+                            {{ skill.name }}
+                            <div class="info">{{ skill.description }}
+                                <a class="small-interactive-text" href="{{ skill.url }}">Learn More</a>
+                            </div>
+                        </a>
+                    </div>
+                {% endfor %}
+            </div>
+            <h3>Other Skills I have</h3>
+            <div class="skills-list">
+                {% for skill in other_skills %}
                     <div class="skill-button">
                         <a class="btn btn-default skills-list-item show-info">
                             {{ skill.name }}

@@ -13,7 +13,6 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from pathlib import Path
 from dotenv import load_dotenv
 from os import getenv as env
-from os import path
 import phonenumber_field
 
 load_dotenv()  # Load environment variables from .env file
@@ -27,11 +26,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env('DEBUG')
+DEBUG = bool(env('DEBUG'))
 
 ADMINS = [(env('ADMIN_NAME'), env('ADMIN_EMAIL'))]
-
-ALLOWED_HOSTS = [env('ALLOWED_HOSTS')]
 
 EMAIL_HOST_USER = env('EMAIL_HOST_USER')  # email address that will be used to send emails (should be a gmail account)
 
@@ -155,7 +152,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

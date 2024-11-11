@@ -10,14 +10,5 @@ $(document).ready(function () {
                 duration: 100
             }, "linear");
 
-        // $(this).find('.info').animate({
-        //     width: '50%',
-        //     height: 'fit-content'
-        // }, {
-        //     queue: false,
-        //     duration: 100
-        // }).slideToggle();
-
-
     });
 });
