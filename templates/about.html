@@ -39,7 +39,7 @@
         {% for experience in education_experiences %}
             <div class="experience">
                 <small>{{ experience.start_date|date:"M Y" }} - {% if experience.current %}Present{% else %}
-                    {{ experience.end_date|date:"M Y"}} {% endif %} </small>
+                    {{ experience.end_date|date:"M Y" }} {% endif %} </small>
                 <br>
                 <strong class="experience-title">{{ experience.title }}</strong> - 
                 <a class="interactive-text" href="{{ experience.url }}">{{ experience.organization }}</a>
@@ -83,7 +83,7 @@
                         <a class="btn btn-default skills-list-item show-info">
                             {{ skill.name }}
                             <div class="info">{{ skill.description }}
-                                <a class="small-interactive-text" href="{{ skill.url }}">Learn More</a>
+                                <a class="interactive-text" href="{{ skill.url }}">Learn More</a>
                             </div>
                         </a>
                     </div>
@@ -96,7 +96,7 @@
                         <a class="btn btn-default skills-list-item show-info">
                             {{ skill.name }}
                             <div class="info">{{ skill.description }}
-                                <a class="small-interactive-text" href="{{ skill.url }}">Learn More</a>
+                                <a class="interactive-text" href="{{ skill.url }}">Learn More</a>
                             </div>
                         </a>
                     </div>
@@ -109,7 +109,7 @@
                         <a class="btn btn-default skills-list-item show-info">
                             {{ skill.name }}
                             <div class="info">{{ skill.description }}
-                                <a class="small-interactive-text" href="{{ skill.url }}">Learn More</a>
+                                <a class="interactive-text" href="{{ skill.url }}">Learn More</a>
                             </div>
                         </a>
                     </div>
@@ -124,7 +124,6 @@
                             <div class="info">{{ skill.description }} 
                                 <a class="interactive-text" href="{{ skill.url }}">Learn More</a>
                             </div>
-
                         </a>
                     </div>
                 {% endfor %}

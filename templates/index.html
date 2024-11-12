@@ -38,9 +38,9 @@
                 <p>Hi, I'm Matt. I'm a Full-stack web developer and QA automation specialist currently working for
                     <a class="interactive-text" href="https://www.nextech.com" target="_blank" rel="noopener">Nextech Systems</a>&nbsp;and studying
                     Computer Science at
-                    <a class="interactive-text" href="https://loyno.edu">Loyola University New Orleans</a>.&nbsp where I am set to graduate in December 2024 with a 3.74 GPA.
-                    I specialize in
+                    <a class="interactive-text" href="https://loyno.edu">Loyola University New Orleans</a>.&nbspWhere I am set to graduate in December 2024 with a 3.74 GPA.
                 </p>
+                <p>I specialize in:</p>
                 <div class="skills-list">
                 {% for skill in highlighted_skills %}
                     <div class="skill-button">
@@ -51,6 +51,7 @@
                     </div>
                 {% endfor %}
                 </div>
+            <a id="about-button" class="btn btn-default" href="{% url 'about' %}">Click Here For More</a>
             </div>
         </div>
     </section>
@@ -71,6 +72,6 @@
         <h2>Contact Me</h2>
         <p>Email: <a class="interactive-text" href="mailto:{{ email }}">{{ email }}</a></p>
         
-        <a id="contact-button" href="{% url 'contactme' %}">Or Contact Me Here</a>
+        <a id="contact-button" href="{% url 'contactme' %}" class="btn btn-default">Or Contact Me Here</a>
     </section>
 {% endblock %}

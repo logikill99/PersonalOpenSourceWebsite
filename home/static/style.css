@@ -135,11 +135,6 @@ a {
     transition: border-bottom 0.3s;
 }
 
-#contact a:hover {
-    background-color: var(--background-color);
-}
-
-
 #projects {
     justify-content: space-between;
 }
@@ -246,12 +241,20 @@ a {
     background-color: var(--accent-color);
     color: var(--text-color);
     border-radius: 5px;
-    transition: background-color 0.3s;
+
+    border: 1px solid var(--border-color);
+}
+
+#contact-button:hover {
+    background-color: var(--accent-color);
+    transition: 0.3s;
+    color: var(--secondary-text-color);
 }
 
 .interactive-text {
     color: var(--text-color);
-    text-decoration: AccentColor;
+    text-decoration-line: underline;
+    text-decoration-thickness: 1px;
     transition: 0.3s;
 }
 
@@ -410,6 +413,7 @@ body {
     justify-content: left;
     text-overflow: ellipsis;
     min-width: fit-content;
+    cursor: pointer;
 }
 
 .skill-button > a > div {
@@ -547,4 +551,22 @@ body {
     .container {
         grid-template-columns: 1fr;
     }
+}
+
+#about-button {
+    display: inline-block;
+    margin-top: 20px;
+    background-color: var(--accent-color);
+    color: var(--text-color);
+    border-radius: 5px;
+    transition: background-color 0.3s;
+    cursor: pointer;
+    padding: 10px;
+    text-decoration: none;
+}
+
+#about-button:hover {
+    background-color: var(--header-bg-color);
+    color: var(--secondary-text-color);
+    transition: background-color 0.3s;
 }
