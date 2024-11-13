@@ -65,6 +65,7 @@ LISTED_DISCORD = str(env('LISTED_DISCORD'))  # discord link
 
 ALLOWED_HOSTS = [str(env('ALLOWED_HOSTS'))]
 
+HOMEPAGE_IMAGE_CAPTION = str(env('HOMEPAGE_IMAGE_CAPTION'))
 # Application definition
 
 INSTALLED_APPS = [

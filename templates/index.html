@@ -33,9 +33,10 @@
         <div class="container">
         <div id="about-me-images">
             <img src="{% static '1.jpg' %}" alt="Just An Image I like">
+            <small>{{ image_caption }}</small>
         </div>
             <div class="about-me-text">
-                <p>Hi, I'm Matt. I'm a Full-stack web developer and QA automation specialist currently working for
+                <p>Hi, I'm {{ name }}. I'm a Full-stack web developer and QA automation specialist currently working for
                     <a class="interactive-text" href="https://www.nextech.com" target="_blank" rel="noopener">Nextech Systems</a>&nbsp;and studying
                     Computer Science at
                     <a class="interactive-text" href="https://loyno.edu">Loyola University New Orleans</a>.&nbspWhere I am set to graduate in December 2024 with a 3.74 GPA.
