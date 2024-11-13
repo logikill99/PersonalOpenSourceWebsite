@@ -10,6 +10,7 @@ from PersonalHomePage.settings import (
     LISTED_DISCORD,
     LISTED_NAME,
     LISTED_TITLE,
+    HOMEPAGE_IMAGE_CAPTION
 )
 from home.models import Experience, Skill
 
@@ -38,6 +39,7 @@ def home(request):
             "email": LISTED_EMAIL,
             "name": LISTED_NAME,
             "title": LISTED_TITLE,
+            "image_caption": HOMEPAGE_IMAGE_CAPTION
         },
     )
 
