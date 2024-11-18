@@ -12,6 +12,7 @@ class Skill(models.Model):
     description = models.TextField()
     type = models.CharField(max_length=15)
     url = models.URLField()
+    importance_value = models.SmallIntegerField(default=1)
 
     def __str__(self):
         return self.name

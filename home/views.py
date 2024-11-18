@@ -1,4 +1,9 @@
+from logging import lastResort
+
+from django.db.models.base import ModelState
 from django.shortcuts import render
+from django.template.defaultfilters import title
+
 from contactme.models import Contact, Message
 from contactme.views import contact_view, contact_success_view
 from blog.models import Category, Post
@@ -60,6 +65,13 @@ def about(request):
     frameworks = Skill.objects.filter(type="framework")
     hobbies = Skill.objects.filter(type="hobby")
     other_skills = Skill.objects.filter(type="other")
+    
+    current_job = work_experiences.filter(current=1).first()
+    current_education = education_experiences.filter(current=1).first()
+    most_important_languages = languages.order_by("-importance_value")[:3]
+    most_important_frameworks = frameworks.order_by("-importance_value")[:4]
+    last_most_important_language = languages.order_by("-importance_value")[3:4].first()
+    last_most_important_framework = frameworks.order_by("-importance_value")[4:5].first()
 
     return render(
         request,
@@ -73,10 +85,13 @@ def about(request):
             "education_experiences": education_experiences,
             "work_experiences": work_experiences,
             "personal_experiences": personal_experiences,
-            "linkedin": LISTED_LINKEDIN,
-            "github": LISTED_GITHUB,
-            "twitter": LISTED_TWITTER,
-            "discord": LISTED_DISCORD,
-            "email": LISTED_EMAIL,
+            "current_job": current_job,
+            "current_education": current_education,
+            "most_important_languages": most_important_languages,
+            "most_important_frameworks": most_important_frameworks,
+            "last_most_important_language": last_most_important_language,
+            "last_most_important_framework": last_most_important_framework,
+            "name": LISTED_NAME,
+            "title": LISTED_TITLE
         },
     )
