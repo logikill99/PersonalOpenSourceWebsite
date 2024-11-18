@@ -7,7 +7,7 @@
     <script src="{% static 'expand.js' %}"></script>
     <section id="about">
         <h2>About Me</h2>
-        <p>Hi, I'm <strong>{{ name }}</strong>, a dedicated {{ title }}.
+        <p>Hi, I'm <strong>{{ name }}</strong>, a dedicated {{ in_text_title }}.
             {% if work_experiences.first.current == 1 and work_experiences.count >= 1 %}
             	I am currently working on cutting-edge solutions at <a class="interactive-text" href="{{work_experiences.first.url}}" target="_blank" rel="noopener">{{ work_experiences.first.organization }}</a>. &nbsp;
             {% elif work_experiences.first.current != 1 and work_experiences.count >= 1 %}
