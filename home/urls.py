@@ -10,5 +10,4 @@ urlpatterns = [
     path("blog/", blog_index, name="blog"),
     path("about/", views.about, name="about"),
 ]
-# TODO: add about me/resume page
 # TODO: add uses page

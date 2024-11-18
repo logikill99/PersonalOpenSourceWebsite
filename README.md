@@ -46,6 +46,11 @@ LISTED_GITHUB = "https://github.com/logikill99" # Links to your github media
 LISTED_LINKEDIN = "https://www.linkedin.com/in/matthew-levin-5976551a1/" # Links to your linkedin
 LISTED_TWITTER = "" # Wip
 LISTED_DISCORD = "" # Wip
+LISTED_NAME = "Your Name" # this is the name that will show up throughout the site
+LISTED_TITLE = "Full Stack Developer, QA Automation Specialist"
+ADMIN_EMAIL = "makesuretochangethis@sample.com" # the email that will recive admin notificatoins 
+ADMIN_NAME = "Matt"
+ALLOWED_HOSTS = "localhost" # this is your domain that is hosting the website just leave it as localhost when debugging and running locally
 ```
 
 ## RUNNING IN DOCKER
@@ -148,3 +153,7 @@ If all the dependencies are installed correctly this should work regardless of o
 then you can go to `localhost:8000` in your browser and everything should be set!
 
 if you want to add stuff to the database go to `localhost:8000/admin` and login with the credentials you made for the superuser
+
+# Setting up your database
+
+The database contains almost everything of substance for the site, all skills, blog posts, projects, and most descriptions are managed by the database. I made some weird design decisions when making the database models but I did do most of them to make the site more extensible. Pretty much all of it can be done by going to /admin

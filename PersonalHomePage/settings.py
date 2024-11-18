@@ -65,6 +65,8 @@ LISTED_DISCORD = str(env('LISTED_DISCORD'))  # discord link
 
 ALLOWED_HOSTS = [str(env('ALLOWED_HOSTS'))]
 
+LISTED_IN_TEXT_TITLE = str(env('IN_TEXT_TITLE'))  # Title that will appear in text and blurbs
+
 HOMEPAGE_IMAGE_CAPTION = str(env('HOMEPAGE_IMAGE_CAPTION'))
 # Application definition
 
