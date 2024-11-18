@@ -48,6 +48,7 @@ LISTED_TWITTER = "" # Wip
 LISTED_DISCORD = "" # Wip
 LISTED_NAME = "Your Name" # this is the name that will show up throughout the site
 LISTED_TITLE = "Full Stack Developer, QA Automation Specialist"
+LISTED_IN_TEXT_TITLE = "Full Stack Developer and QA Automation Specialist"
 ADMIN_EMAIL = "makesuretochangethis@sample.com" # the email that will recive admin notificatoins 
 ADMIN_NAME = "Matt"
 ALLOWED_HOSTS = "localhost" # this is your domain that is hosting the website just leave it as localhost when debugging and running locally
