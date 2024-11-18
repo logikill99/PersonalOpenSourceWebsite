@@ -57,10 +57,10 @@ def about(request):
     hobbies = Skill.objects.filter(type="hobby")
     other_skills = Skill.objects.filter(type="other")
     
-    most_important_languages = languages.order_by("-importance_value")[:3]
-    most_important_frameworks = frameworks.order_by("-importance_value")[:4]
-    last_most_important_language = languages.order_by("-importance_value")[3:4].first()
-    last_most_important_framework = frameworks.order_by("-importance_value")[4:5].first()
+    most_important_languages = languages.order_by("importance_value")[:3]
+    most_important_frameworks = frameworks.order_by("importance_value")[:4]
+    last_most_important_language = languages.order_by("importance_value")[3:4].first()
+    last_most_important_framework = frameworks.order_by("importance_value")[4:5].first()
 
     return render(
         request,
