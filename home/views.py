@@ -24,12 +24,14 @@ def home(request):
         "index.html",
         {
             "highlighted_skills": highlighted_skills,
+            ""
             "projects": projects,
             "linkedin": LISTED_LINKEDIN,
             "github": LISTED_GITHUB,
             "email": LISTED_EMAIL,
             "name": LISTED_NAME,
             "title": LISTED_TITLE,
+            "in_text_title": LISTED_IN_TEXT_TITLE,
             "image_caption": HOMEPAGE_IMAGE_CAPTION
         },
     )

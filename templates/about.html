@@ -9,11 +9,11 @@
         <h2>About Me</h2>
         <p>Hi, I'm <strong>{{ name }}</strong>, a dedicated {{ in_text_title }}.
             {% if work_experiences.first.current == 1 and work_experiences.count >= 1 %}
-            	I am currently working on cutting-edge solutions at <a class="interactive-text" href="{{work_experiences.first.url}}" target="_blank" rel="noopener">{{ work_experiences.first.organization }}</a>. &nbsp;
+            	I am currently working on cutting-edge solutions at <a class="interactive-text" href="{{work_experiences.first.url}}" target="_blank" rel="noopener">{{ work_experiences.first.organization }}</a>.&nbsp;
             {% elif work_experiences.first.current != 1 and work_experiences.count >= 1 %}
-                I recently was working on cutting-edge solutions at <a class="interactive-text" href="{{work_experiences.first.url}}" target="_blank" rel="noopener">{{ work_experiences.first.organization }}</a>. &nbsp;
+                I recently was working on cutting-edge solutions at <a class="interactive-text" href="{{work_experiences.first.url}}" target="_blank" rel="noopener">{{ work_experiences.first.organization }}</a>.&nbsp;
             {% elif  work_experiences.first.current != 1 and work_experiences.count <= 1 %}
-                I am currently looking for work and have a strong work ethic. &nbsp;
+                I am currently looking for work and have a strong work ethic.&nbsp;
             {% endif %} 
             
             {% if education_experiences.first.current == 1 and education_experiences.count >= 1 %}
@@ -22,16 +22,17 @@
                 I graduated from <a class="interactive-text" href="{{ education_experiences.first.url }}" target="_blank" rel="noopener">{{ education_experiences.first.organization }}</a> with a {{ education_experiences.first.title }} in Computer Science in {{ education_experiences.first.end_date|date:"F Y"}}.
             {% endif %}
         </p>
-    <p>With a strong foundation in programming languages like {% for skill in most_important_languages %} {{ skill.name }}, {% endfor %} and {{ last_most_important_language.name }} alongside proficiency in frameworks such as {% for skill in most_important_frameworks %} {{ skill.name }}, {% endfor %} and {{ last_most_important_framework.name }}
-    I am able to excel in creating robust, user-centric web applications and automated testing solutions. 
-    My professional experience includes maintaining enterprise-level practice management systems, optimizing SQL Server database performance, 
-    and implementing dynamic user interfaces with modern web technologies.</p>
+        <p>I have a strong foundation in programming languages like {% for skill in most_important_languages %} {{ skill.name }}, {% endfor %} and {{ last_most_important_language.name }} alongside proficiency in frameworks such as {% for skill in most_important_frameworks %} {{ skill.name }}, {% endfor %} and {{ last_most_important_framework.name }}
+        I am able to excel in creating robust, user-centric web applications and automated testing solutions. 
+        My professional experience includes maintaining enterprise-level practice management systems, optimizing SQL Server database performance, 
+        and implementing dynamic user interfaces with modern web technologies.</p>
 
-    <p>Outside of work and school, I'm proud to be an Eagle Scout, a rank that represents years of commitment, leadership, and community service.
-    For my Eagle Scout project, I designed and built a sensory path for a local elementary school to help kids develop motor skills and create a fun, interactive space for learning. 
-    Scouting has taught me persistence, adaptability, problem-solving, and compassion which I carry into everything I do</p>
+        <p>Outside of work and school, I'm proud to be an Eagle Scout, a rank that represents years of commitment, leadership, and community service.
+        For my Eagle Scout project, I designed and built a sensory path for a local elementary school to help kids develop motor skills and create a fun, interactive space for learning. 
+        Scouting has taught me persistence, adaptability, problem-solving, and compassion which I carry into everything I do</p>
 
-        <p>Below is my interactive resume. Please look it over and <a class="interactive-text" href="{% url 'contactme' %}">contact me!</a></p>
+        <p>Below is my interactive resume. Please look it over and <a class="interactive-text" href="{% url 'contactme' %}">Contact Me!</a> or to view my resume as a PDF:</p>
+        <a id="about-button" href="{% static 'resume.pdf' %}" download>Click Here For PDF</a>
         <h2>Work experience</h2>
         {% for experience in work_experiences %}
             <div class="experience">

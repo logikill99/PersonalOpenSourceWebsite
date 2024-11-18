@@ -582,3 +582,20 @@ body {
     color: var(--secondary-text-color);
     transition: background-color 0.3s;
 }
+
+#pdf-button {
+    display: inline-block;
+    margin-top: 20px;
+    background-color: var(--accent-color);
+    color: var(--text-color);
+    border-radius: 5px;
+    transition: background-color 0.3s;
+    cursor: pointer;
+    padding: 10px;
+    text-decoration: none;
+}
+#pdf-button:hover {
+    background-color: var(--header-bg-color);
+    color: var(--secondary-text-color);
+    transition: background-color 0.3s;
+}
