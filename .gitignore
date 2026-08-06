@@ -1,33 +1,61 @@
-
+# OS
 .DS_Store
+Thumbs.db
+
+# Secrets / environment
 .env
-.idea/dataSources.xml
-.idea/discord.xml
-blog/__pycache__/__init__.cpython-312.pyc
-blog/__pycache__/admin.cpython-312.pyc
-blog/__pycache__/apps.cpython-312.pyc
-blog/__pycache__/models.cpython-312.pyc
-blog/migrations/__pycache__/__init__.cpython-312.pyc
-contactme/__pycache__/__init__.cpython-312.pyc
-contactme/__pycache__/admin.cpython-312.pyc
-contactme/__pycache__/apps.cpython-312.pyc
-contactme/__pycache__/forms.cpython-312.pyc
-contactme/__pycache__/models.cpython-312.pyc
-contactme/__pycache__/urls.cpython-312.pyc
-contactme/__pycache__/views.cpython-312.pyc
-contactme/migrations/__pycache__/0001_initial.cpython-312.pyc
-contactme/migrations/__pycache__/__init__.cpython-312.pyc
-db.sqlite3
-home/__pycache__/__init__.cpython-312.pyc
-home/__pycache__/admin.cpython-312.pyc
-home/__pycache__/apps.cpython-312.pyc
-home/__pycache__/models.cpython-312.pyc
-home/__pycache__/urls.cpython-312.pyc
-home/__pycache__/views.cpython-312.pyc
-home/migrations/__pycache__/0001_initial.cpython-312.pyc
-home/migrations/__pycache__/__init__.cpython-312.pyc
-PersonalHomePage/__pycache__/__init__.cpython-312.pyc
-PersonalHomePage/__pycache__/settings.cpython-312.pyc
-PersonalHomePage/__pycache__/urls.cpython-312.pyc
-PersonalHomePage/__pycache__/wsgi.cpython-312.pyc
+.env.*
+!.env.example
+!.env.sample
 PersonalHomePage/.env
+
+# SQLite databases (never commit local dev/prod DBs)
+db.sqlite3
+*.sqlite3
+*.sqlite3-journal
+*.sqlite3-wal
+*.sqlite3-shm
+*.db
+
+# Django media uploads (user-generated content)
+media/
+mediafiles/
+uploads/
+*/media/
+static/media/
+
+# Django static collection output
+staticfiles/
+static_collected/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+.eggs/
+build/
+dist/
+
+# Virtualenvs
+venv/
+.venv/
+env/
+ENV/
+
+# IDEs / editors
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Tooling
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+*.log
