@@ -1,7 +1,14 @@
 # PersonalOpenSourceWebsite
 
-This is the source code for my personal portfolio website that is written in Django (soon to be deployed on mslevin.dev).
+This is the source code for my personal portfolio website that is written in Django (to be deployed on mslevin.dev).
 it is meant to be a very drop in solution for anyone else who wants to use it or modify it. 
+
+## Status
+
+- **Content storage:** All site content (skills, blog posts, projects, descriptions, etc.) lives in a SQLite database, managed via the Django admin at `/admin`.
+- **Target domain:** mslevin.dev
+- **Last production activity:** May 2026
+- **Production deployment:** The PythonAnywhere production deployment is currently offline.
 
 This website can be run in a docker container, or locally without docker. 
 
