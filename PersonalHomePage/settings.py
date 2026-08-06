@@ -10,32 +10,81 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
+import warnings
 from pathlib import Path
+
+from django.core.exceptions import ImproperlyConfigured
 from dotenv import load_dotenv
 from os import getenv as env
 from os import path
-import phonenumber_field
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 # Load environment variables from .env file
 load_dotenv(path.join(BASE_DIR, '.env'))
 
+
+def env_bool(name: str, default: bool = False) -> bool:
+    """Parse a boolean env var explicitly.
+
+    Avoids the classic `bool(os.getenv(...))` footgun where any non-empty
+    string (including "False", "0", "no") evaluates to True.
+
+    Truthy values (case-insensitive): "1", "true", "yes", "on".
+    Everything else — including unset — is falsy.
+    """
+    raw = env(name)
+    if raw is None:
+        return default
+    return raw.strip().lower() in {"1", "true", "yes", "on"}
+
+
+def env_list(name: str, default: list[str] | None = None) -> list[str]:
+    """Parse a comma-separated env var into a list of strings.
+
+    Strips whitespace around each item and drops empties, so
+    "example.com, www.example.com,, " -> ["example.com", "www.example.com"].
+    """
+    raw = env(name)
+    if raw is None:
+        return list(default) if default is not None else []
+    return [item.strip() for item in raw.split(",") if item.strip()]
+
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = str(env('SECRET_KEY'))
-
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = bool(env('DEBUG'))
+DEBUG = env_bool('DEBUG', default=False)
 
-ADMINS = [(str(env('ADMIN_NAME')), str(env('ADMIN_EMAIL')))]
+# SECURITY WARNING: keep the secret key used in production secret!
+_secret_key = env('SECRET_KEY')
+if not _secret_key:
+    if DEBUG:
+        # Insecure fallback for local dev ONLY. Never usable in production
+        # because production must run with DEBUG=False.
+        _secret_key = 'django-insecure-dev-only-key-do-not-use-in-production'
+        warnings.warn(
+            'SECRET_KEY is not set; using an insecure development key. '
+            'Set SECRET_KEY in your .env before deploying.',
+            stacklevel=2,
+        )
+    else:
+        raise ImproperlyConfigured(
+            'SECRET_KEY environment variable is required when DEBUG=False. '
+            'Refusing to start without it.'
+        )
+SECRET_KEY = _secret_key
 
-EMAIL_HOST_USER = str(
-    env('EMAIL_HOST_USER'))  # email address that will be used to send emails (should be a gmail account)
+# Comma-separated list of host/domain names this site can serve.
+# e.g. ALLOWED_HOSTS=example.com,www.example.com
+ALLOWED_HOSTS = env_list('ALLOWED_HOSTS')
 
-EMAIL_HOST_PASSWORD = str(env('EMAIL_HOST_PASSWORD'))  # password of the email-id
+ADMINS = [(env('ADMIN_NAME', ''), env('ADMIN_EMAIL', ''))]
+
+EMAIL_HOST_USER = env('EMAIL_HOST_USER', '')  # email address that will be used to send emails (should be a gmail account)
+
+EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD', '')  # password of the email-id
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
@@ -47,27 +96,26 @@ EMAIL_PORT = 587
 
 REGION = 'US'
 
-LISTED_NAME = str(env('LISTED_NAME'))  # name that will be listed on the home page
+LISTED_NAME = env('LISTED_NAME', '')  # name that will be listed on the home page
 
-LISTED_TITLE = str(env('LISTED_TITLE'))  # title that will be listed on the home page
+LISTED_TITLE = env('LISTED_TITLE', '')  # title that will be listed on the home page
 
-LISTED_EMAIL = str(env('LISTED_EMAIL'))  # email that will be listed on the home page
+LISTED_EMAIL = env('LISTED_EMAIL', '')  # email that will be listed on the home page
 
-LISTED_PHONE = str(env('LISTED_PHONE'))  # phone number that will be listed on the home page
+LISTED_PHONE = env('LISTED_PHONE', '')  # phone number that will be listed on the home page
 
-LISTED_GITHUB = str(env('LISTED_GITHUB'))  # github link
+LISTED_GITHUB = env('LISTED_GITHUB', '')  # github link
 
-LISTED_LINKEDIN = str(env('LISTED_LINKEDIN'))  # linkedin link
+LISTED_LINKEDIN = env('LISTED_LINKEDIN', '')  # linkedin link
 
-LISTED_TWITTER = str(env('LISTED_TWITTER'))  # twitter link
+LISTED_TWITTER = env('LISTED_TWITTER', '')  # twitter link
 
-LISTED_DISCORD = str(env('LISTED_DISCORD'))  # discord link
+LISTED_DISCORD = env('LISTED_DISCORD', '')  # discord link
 
-ALLOWED_HOSTS = [str(env('ALLOWED_HOSTS'))]
+LISTED_IN_TEXT_TITLE = env('IN_TEXT_TITLE', '')  # Title that will appear in text and blurbs
 
-LISTED_IN_TEXT_TITLE = str(env('IN_TEXT_TITLE'))  # Title that will appear in text and blurbs
+HOMEPAGE_IMAGE_CAPTION = env('HOMEPAGE_IMAGE_CAPTION', '')
 
-HOMEPAGE_IMAGE_CAPTION = str(env('HOMEPAGE_IMAGE_CAPTION'))
 # Application definition
 
 INSTALLED_APPS = [
