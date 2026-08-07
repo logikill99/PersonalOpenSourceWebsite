@@ -2,7 +2,6 @@
 {% load static %}
 
 {% block page_content %}
-    <script src="{% static 'expand.js' %}"></script>
     <section id="about">
         <h2>About Me</h2>
         <p>Hi, I'm <strong>{{ name }}</strong>, a dedicated {{ in_text_title }}.
@@ -42,10 +41,13 @@
                 <div class="experience-description">{{ experience.description | linebreaks }}</div>
                 <div class="experience-skills">
                     {% for skill in experience.skills.all %}
-                        <div class="skill-button">
+                        <div class="skill-button"
+                             x-data="{ open: false }"
+                             @click="open = !open; if (open) { $dispatch('skill-open', { el: $el }) }"
+                             @skill-open.window="if ($event.detail.el !== $el) { open = false }">
                             <a class="btn btn-default skills-list-item show-info">
                                 {{ skill.name }}
-                                <div class="info">{{ skill.description }}</div>
+                                <div class="info" x-cloak x-show="open" x-transition:enter.duration.100ms x-transition:leave.duration.100ms>{{ skill.description }}</div>
                             </a>
                         </div>
                     {% endfor %}
@@ -63,10 +65,13 @@
                 <div class="experience-description">{{ experience.description | linebreaks }}</div>
                 <div class="experience-skills">
                     {% for skill in experience.skills.all %}
-                        <div class="skill-button">
+                        <div class="skill-button"
+                             x-data="{ open: false }"
+                             @click="open = !open; if (open) { $dispatch('skill-open', { el: $el }) }"
+                             @skill-open.window="if ($event.detail.el !== $el) { open = false }">
                             <a class="btn btn-default skills-list-item show-info">
                                 {{ skill.name }}
-                                <div class="info">{{ skill.description }}</div>
+                                <div class="info" x-cloak x-show="open" x-transition:enter.duration.100ms x-transition:leave.duration.100ms>{{ skill.description }}</div>
                             </a>
                         </div>
                     {% endfor %}
@@ -81,10 +86,13 @@
                 <div class="experience-description">{{ experience.description | linebreaks }}</div>
                 <div class="experience-skills">
                     {% for skill in experience.skills.all %}
-                        <div class="skill-button">
+                        <div class="skill-button"
+                             x-data="{ open: false }"
+                             @click="open = !open; if (open) { $dispatch('skill-open', { el: $el }) }"
+                             @skill-open.window="if ($event.detail.el !== $el) { open = false }">
                             <a class="btn btn-default skills-list-item show-info">
                                 {{ skill.name }}
-                                <div class="info">{{ skill.description }}</div>
+                                <div class="info" x-cloak x-show="open" x-transition:enter.duration.100ms x-transition:leave.duration.100ms>{{ skill.description }}</div>
                             </a>
                         </div>
                     {% endfor %}
@@ -96,11 +104,14 @@
             <h3>Languages I know how to use</h3>
             <div class="skills-list">
                 {% for skill in languages %}
-                    <div class="skill-button">
+                    <div class="skill-button"
+                         x-data="{ open: false }"
+                         @click="open = !open; if (open) { $dispatch('skill-open', { el: $el }) }"
+                         @skill-open.window="if ($event.detail.el !== $el) { open = false }">
                         <a class="btn btn-default skills-list-item show-info">
                             {{ skill.name }}
-                            <div class="info">{{ skill.description }}
-                                <a class="interactive-text" href="{{ skill.url }}">Learn More</a>
+                            <div class="info" x-cloak x-show="open" x-transition:enter.duration.100ms x-transition:leave.duration.100ms>{{ skill.description }}
+                                <a class="interactive-text" href="{{ skill.url }}" @click.stop>Learn More</a>
                             </div>
                         </a>
                     </div>
@@ -109,11 +120,14 @@
             <h3>Frameworks Databases and other Technologies I know how to use</h3>
             <div class="skills-list">
                 {% for skill in frameworks %}
-                    <div class="skill-button">
+                    <div class="skill-button"
+                         x-data="{ open: false }"
+                         @click="open = !open; if (open) { $dispatch('skill-open', { el: $el }) }"
+                         @skill-open.window="if ($event.detail.el !== $el) { open = false }">
                         <a class="btn btn-default skills-list-item show-info">
                             {{ skill.name }}
-                            <div class="info">{{ skill.description }}
-                                <a class="interactive-text" href="{{ skill.url }}">Learn More</a>
+                            <div class="info" x-cloak x-show="open" x-transition:enter.duration.100ms x-transition:leave.duration.100ms>{{ skill.description }}
+                                <a class="interactive-text" href="{{ skill.url }}" @click.stop>Learn More</a>
                             </div>
                         </a>
                     </div>
@@ -122,11 +136,14 @@
             <h3>Other Skills I have</h3>
             <div class="skills-list">
                 {% for skill in other_skills %}
-                    <div class="skill-button">
+                    <div class="skill-button"
+                         x-data="{ open: false }"
+                         @click="open = !open; if (open) { $dispatch('skill-open', { el: $el }) }"
+                         @skill-open.window="if ($event.detail.el !== $el) { open = false }">
                         <a class="btn btn-default skills-list-item show-info">
                             {{ skill.name }}
-                            <div class="info">{{ skill.description }}
-                                <a class="interactive-text" href="{{ skill.url }}">Learn More</a>
+                            <div class="info" x-cloak x-show="open" x-transition:enter.duration.100ms x-transition:leave.duration.100ms>{{ skill.description }}
+                                <a class="interactive-text" href="{{ skill.url }}" @click.stop>Learn More</a>
                             </div>
                         </a>
                     </div>
@@ -135,11 +152,14 @@
             <h3>Hobbies and things I'm interested in</h3>
             <div class="skills-list">
                 {% for skill in hobbies %}
-                    <div class="skill-button">
+                    <div class="skill-button"
+                         x-data="{ open: false }"
+                         @click="open = !open; if (open) { $dispatch('skill-open', { el: $el }) }"
+                         @skill-open.window="if ($event.detail.el !== $el) { open = false }">
                         <a class="btn btn-default skills-list-item show-info">
                             {{ skill.name }}
-                            <div class="info">{{ skill.description }} 
-                                <a class="interactive-text" href="{{ skill.url }}">Learn More</a>
+                            <div class="info" x-cloak x-show="open" x-transition:enter.duration.100ms x-transition:leave.duration.100ms>{{ skill.description }} 
+                                <a class="interactive-text" href="{{ skill.url }}" @click.stop>Learn More</a>
                             </div>
                         </a>
                     </div>

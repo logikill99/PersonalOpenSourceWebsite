@@ -431,6 +431,10 @@ body {
     margin: 10px;
 }
 
+[x-cloak] {
+    display: none !important;
+}
+
 .clickable-div {
     display: block;
     height: 100%;
