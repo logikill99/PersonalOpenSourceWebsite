@@ -2,12 +2,13 @@
 # railway-volume-setup.sh
 # One-shot volume provisioning for the PersonalOpenSourceWebsite service on Railway.
 #
-# WHY: Django settings.py resolves the SQLite DB as BASE_DIR/'db.sqlite3'. The
-# Dockerfile WORKDIR is /app, so BASE_DIR == /app. Railway containers are
-# ephemeral; the only writable, persistent storage is a mounted volume. We
-# therefore mount a volume at /data and point Django at /data/db.sqlite3 via
-# the SQLITE_PATH env var (settings.py change lives in the modernization
-# track, t_17b40095 "Deploy: rewrite Dockerfile for Railway").
+# WHY: Django settings.py resolves the SQLite DB as BASE_DIR/'db.sqlite3' by
+# default, or DATABASE_PATH if set. The Dockerfile WORKDIR is /app, so
+# BASE_DIR == /app. Railway containers are ephemeral; the only writable,
+# persistent storage is a mounted volume. We therefore mount a volume at
+# /data and point Django at /data/db.sqlite3 via the DATABASE_PATH env var
+# (settings.py change lives in the modernization track, t_17b40095 "Deploy:
+# rewrite Dockerfile for Railway").
 #
 # Prerequisites:
 #   - railway CLI (installed at ~/.local/bin/railway, v5.30.4+)
@@ -71,7 +72,7 @@ echo "Volume state after run:"
 cat <<EOF
 
 Next steps (not automated here on purpose):
-1. settings.py must read SQLITE_PATH (default /data/db.sqlite3) - tracked in
+1. settings.py must read DATABASE_PATH (default /data/db.sqlite3) - tracked in
    the modernization/deploy track, NOT this task.
 2. Seed the volume with prod-import/db.seed.sqlite3 - task t_c5e51d0c.
 3. Redeploy the service so the mount takes effect: railway up / redeploy.
