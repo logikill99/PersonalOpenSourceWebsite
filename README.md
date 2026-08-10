@@ -63,7 +63,7 @@ ALLOWED_HOSTS = "localhost" # this is your domain that is hosting the website ju
 
 ## RUNNING IN DOCKER
 
-**Warning: The dockerfile in the root directory contains sample superuser credentials please change them before deploying to productoion**
+**Warning: The Dockerfile in the root directory no longer contains hardcoded superuser credentials. Set `DJANGO_SUPERUSER_*` env vars before deploying; `entrypoint.sh` will create the superuser automatically.**
 
 
 ### On MacOS/linux
@@ -73,78 +73,14 @@ you may have to give run.sh execute permission (sometimes when doing a git clone
 
 Once that has finished starting up, go to localhost:8000 in your browser
 
-to add things to the database (and the page) you can go to `localhost:8000/admin` and login with username:`admin` password:`admin` 
-these can be changed by changing the following values in the Dockerfile:
-```
-FROM python:3.13.0-alpine
-LABEL authors="matthewlevin"
-WORKDIR /app
-
-COPY . /app
-RUN apk add --no-cache sqlite
-RUN pip3 install -r requirements.txt
-RUN ls -a
-RUN pwd
-ENV PYTHONUNBUFFERED=1
-ENV DJANGO_SETTINGS_MODULE=PersonalHomePage.settings
-
-# TODO: CHANGE THESE IN PRODUCTION
-# Change me!
-ENV DJANGO_SUPERUSER_PASSWORD=admin
-# Change me too!
-ENV DJANGO_SUPERUSER_USERNAME=admin
-# Change me three!
-ENV DJANGO_SUPERUSER_EMAIL=changeme@sample.com
-
-RUN python3 manage.py makemigrations
-RUN python3 manage.py migrate
-RUN python3 manage.py createsuperuser --noinput
-
-EXPOSE 8000
-
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
-```
-
-After changing those values be sure to delete the docker image and container and run `run.sh` again
+to add things to the database (and the page) you can go to `localhost:8000/admin` and login with the superuser credentials you set via env vars (or the defaults in `docker-compose.yml` / your local `.env`). The Dockerfile no longer hardcodes credentials; `entrypoint.sh` creates the superuser from `DJANGO_SUPERUSER_USERNAME`, `DJANGO_SUPERUSER_PASSWORD`, and `DJANGO_SUPERUSER_EMAIL` at container start.
 
 ### on Windows:
 Just right click run.bat and run it as an administrator
 
 Once that has finished starting up, go to localhost:8000 in your browser
 
-to add things to the database (and the page) you can go to `localhost:8000/admin` and login with username:`admin` password:`admin` 
-these can be changed by changing the following values in the Dockerfile:
-```
-FROM python:3.13.0-alpine
-LABEL authors="matthewlevin"
-WORKDIR /app
-
-COPY . /app
-RUN apk add --no-cache sqlite
-RUN pip3 install -r requirements.txt
-RUN ls -a
-RUN pwd
-ENV PYTHONUNBUFFERED=1
-ENV DJANGO_SETTINGS_MODULE=PersonalHomePage.settings
-
-# TODO: CHANGE THESE IN PRODUCTION
-# Change me!
-ENV DJANGO_SUPERUSER_PASSWORD=admin
-# Change me too!
-ENV DJANGO_SUPERUSER_USERNAME=admin
-# Change me three!
-ENV DJANGO_SUPERUSER_EMAIL=changeme@sample.com
-
-RUN python3 manage.py makemigrations
-RUN python3 manage.py migrate
-RUN python3 manage.py createsuperuser --noinput
-
-EXPOSE 8000
-
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
-```
-
-After changing those values be sure to delete the docker image and container and run `run.bat` again
+to add things to the database (and the page) you can go to `localhost:8000/admin` and login with the superuser credentials you set via env vars. The Dockerfile no longer hardcodes credentials; `entrypoint.sh` creates the superuser from `DJANGO_SUPERUSER_USERNAME`, `DJANGO_SUPERUSER_PASSWORD`, and `DJANGO_SUPERUSER_EMAIL` at container start.
 
 **RUNNING WITHOUT DOCKER**
 Once all dependencies are installed run the following commands:
