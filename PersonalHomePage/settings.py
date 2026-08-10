@@ -80,7 +80,11 @@ SECRET_KEY = _secret_key
 # e.g. ALLOWED_HOSTS=example.com,www.example.com
 ALLOWED_HOSTS = env_list('ALLOWED_HOSTS')
 
-ADMINS = [(env('ADMIN_NAME', ''), env('ADMIN_EMAIL', ''))]
+# Django 6.0 deprecates ADMINS as a list of (name, email) tuples; use the
+# "Name <email>" string format (or bare email) instead.
+_admin_name = env('ADMIN_NAME', '')
+_admin_email = env('ADMIN_EMAIL', '')
+ADMINS = [f'{_admin_name} <{_admin_email}>' if _admin_name else _admin_email] if _admin_email else []
 
 EMAIL_HOST_USER = env('EMAIL_HOST_USER', '')  # email address that will be used to send emails (should be a gmail account)
 
