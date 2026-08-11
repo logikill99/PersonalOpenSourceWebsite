@@ -36,7 +36,7 @@ The codebase is small, modern, and vanilla Django. The project code itself needs
 | Dependency bump 5.1.3 → 6.0.8 (all pins re-resolved, `manage.py check` passes) | `modernize/django6-deps` @ 4ead0d1 | t_4afc97e2 |
 | Alpine CDN swap in base.html + drop jQuery script tags | committed on `reconcile/prod-baseline` @ 3753ea0 | t_9574c27e |
 | expand.js behavior port to Alpine | pending | t_830e9eb6 |
-| Prod DB reconciliation (orphan blog categories purged, contactme tables dropped, sanitized seed exported to prod-import/db.seed.sqlite3) | working copy, awaiting Matt approval | t_7c2903da, t_10e3a842 |
+| Prod DB reconciliation (orphan blog categories purged, contactme tables dropped, superuser hash stripped, sanitized seed exported to prod-import/db.seed.sqlite3; Matt ratified 2026-08-10) | seed ready, volume setup pending | t_7c2903da, t_10e3a842, t_80379e90 |
 
 ---
 
@@ -167,7 +167,7 @@ Execution order (each step independently revertable):
 2. **Deps branch** (`modernize/django6-deps`): rebase onto settings, re-run `python -Wd manage.py check`, smoke test. Rollback = revert requirements.txt.
 3. **MyModel removal**: migration on top of 1+2. Rollback = `migrate home 0001` (table is empty either way).
 4. **Alpine behavior port** (t_830e9eb6): templates + CSS + delete expand.js. Rollback = restore expand.js + script tags (git history).
-5. **Prod DB reconciliation** (separate track, awaiting Matt's approval): apply sanitized seed, then run migrations from steps 2–3 against the restored DB.
+5. **Prod DB reconciliation** (decisions ratified by Matt, 2026-08-10): contactme tables dropped and superuser hash stripped from sanitized seed (`prod-import/db.seed.sqlite3`); fresh superuser created via env vars at deploy time. Remaining: seed the Railway volume, then run migrations from steps 2–3 against the restored DB.
 
 ---
 
