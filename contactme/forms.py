@@ -16,7 +16,7 @@ class ContactForm(forms.ModelForm):
 
 
 class MessageForm(forms.Form):
-    message = forms.CharField(widget=forms.Textarea)
+    message = forms.CharField(widget=forms.Textarea(attrs={'rows': 5}))
 
     class Meta:
         model = Message
