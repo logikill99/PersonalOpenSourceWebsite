@@ -1,29 +1,16 @@
 import logging
-from time import monotonic
 
 from django.conf import settings
 from django.contrib import messages
 from django.core.mail import send_mail
 from django.shortcuts import redirect, render
 
+from PersonalHomePage.ratelimit import is_rate_limited
+
 from .forms import ContactForm, MessageForm
 from .models import Contact, Message
 
 logger = logging.getLogger(__name__)
-
-_RATE_WINDOW_SECONDS = 60
-_RATE_MAX_POSTS = 3
-
-
-def _rate_limited(request) -> bool:
-    now = monotonic()
-    stamps = [ts for ts in request.session.get('contact_post_times', []) if now - ts < _RATE_WINDOW_SECONDS]
-    if len(stamps) >= _RATE_MAX_POSTS:
-        request.session['contact_post_times'] = stamps
-        return True
-    stamps.append(now)
-    request.session['contact_post_times'] = stamps
-    return False
 
 
 def contact_view(request):
@@ -31,20 +18,19 @@ def contact_view(request):
         if request.POST.get('website'):
             return redirect('success')
 
-        if _rate_limited(request):
+        contact_form = ContactForm(request.POST)
+        message_form = MessageForm(request.POST)
+        valid = contact_form.is_valid() and message_form.is_valid()
+
+        if valid and is_rate_limited(request, key_prefix='contact', record=True):
             messages.error(request, 'Too many messages. Wait a minute and try again.')
-            contact_form = ContactForm(request.POST)
-            message_form = MessageForm(request.POST)
             return render(
                 request,
                 'contact.html',
                 {'contact_form': contact_form, 'message_form': message_form},
             )
 
-        contact_form = ContactForm(request.POST)
-        message_form = MessageForm(request.POST)
-
-        if contact_form.is_valid() and message_form.is_valid():
+        if valid:
             if not Contact.objects.filter(email=contact_form.cleaned_data['email']).exists():
                 contact_form.save()
 

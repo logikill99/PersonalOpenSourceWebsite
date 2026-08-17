@@ -77,6 +77,8 @@ Next steps (not automated here on purpose):
    /home/slab/sandboxes/hermes-wren/work/prod-import/db.seed.sqlite3
    That file is intentionally NOT in git (PII hygiene). Do not invent a
    repo path for it. If the file is missing, stop; do not ship an empty DB.
+   After the 2026-08-17 repair, contactme tables exist again. If you still
+   have an older seed, fake-unapply contactme then migrate before copy.
 3. Required env: SECRET_KEY, ALLOWED_HOSTS=mslevin.dev,www.mslevin.dev,
    DEBUG=False, plus DJANGO_SUPERUSER_* if you want a fresh admin user.
 4. Redeploy the service so the mount takes effect: railway up / redeploy.

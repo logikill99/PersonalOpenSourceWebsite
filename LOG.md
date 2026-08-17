@@ -70,3 +70,14 @@ Honest leftover facts:
 - Railway project exists; nothing is deployed. DNS cutover is not in this PR.
 
 *Log continued by Morgan. Last updated: 2026-08-17.*
+
+## 2026-08-17 later — adversarial fixes
+
+Claude Code BLOCKED deploy on the local seed: contactme tables were missing
+while django_migrations said they were applied. Repaired live db.sqlite3 and
+the canonical seed at sandboxes/hermes-wren/work/prod-import/db.seed.sqlite3
+via migrate contactme zero --fake && migrate contactme.
+
+Also: IP-keyed rate limit after valid posts, blog comment honeypot, 404 for
+missing posts, DATABASE_PATH blank-safe, healthcheck SSL exempt + railway
+health host, resized 1.jpg 12.8MB -> ~70KB, titles/excerpts/copy, contact CSS.

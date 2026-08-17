@@ -8,6 +8,12 @@ class HomePageSmokeTests(TestCase):
         response = self.client.get(reverse("home"))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Home")
+        self.assertContains(response, "<title>")
+
+    def test_about_has_title(self):
+        response = self.client.get(reverse("about"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "<title>")
 
     def test_static_style_resolves(self):
         path = staticfiles_storage.url("style.css")

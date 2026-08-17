@@ -1,16 +1,6 @@
+from django.conf import settings
 from django.shortcuts import render
-from blog.models import Category, Post
-from PersonalHomePage.settings import (
-    LISTED_EMAIL,
-    LISTED_GITHUB,
-    LISTED_LINKEDIN,
-    LISTED_TWITTER,
-    LISTED_DISCORD,
-    LISTED_NAME,
-    LISTED_TITLE,
-    HOMEPAGE_IMAGE_CAPTION,
-    LISTED_IN_TEXT_TITLE
-)
+from blog.models import Post
 from home.models import Experience, Skill
 
 
@@ -24,15 +14,14 @@ def home(request):
         "index.html",
         {
             "highlighted_skills": highlighted_skills,
-            ""
             "projects": projects,
-            "linkedin": LISTED_LINKEDIN,
-            "github": LISTED_GITHUB,
-            "email": LISTED_EMAIL,
-            "name": LISTED_NAME,
-            "title": LISTED_TITLE,
-            "in_text_title": LISTED_IN_TEXT_TITLE,
-            "image_caption": HOMEPAGE_IMAGE_CAPTION
+            "linkedin": settings.LISTED_LINKEDIN,
+            "github": settings.LISTED_GITHUB,
+            "email": settings.LISTED_EMAIL,
+            "name": settings.LISTED_NAME,
+            "title": settings.LISTED_TITLE,
+            "in_text_title": settings.LISTED_IN_TEXT_TITLE,
+            "image_caption": settings.HOMEPAGE_IMAGE_CAPTION
         },
     )
 
@@ -71,8 +60,8 @@ def about(request):
             "most_important_frameworks": most_important_frameworks,
             "last_most_important_language": last_most_important_language,
             "last_most_important_framework": last_most_important_framework,
-            "name": LISTED_NAME,
-            "title": LISTED_TITLE,
-            "in_text_title": LISTED_IN_TEXT_TITLE
+            "name": settings.LISTED_NAME,
+            "title": settings.LISTED_TITLE,
+            "in_text_title": settings.LISTED_IN_TEXT_TITLE
         },
     )

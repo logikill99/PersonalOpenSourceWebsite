@@ -1,6 +1,7 @@
 from unittest.mock import patch
 
 from django.core import mail
+from django.core.cache import cache
 from django.test import TestCase, override_settings
 
 from contactme.models import Contact, Message
@@ -20,6 +21,9 @@ VALID_CONTACT = {
     DEFAULT_FROM_EMAIL="matt@example.com",
 )
 class ContactFormTests(TestCase):
+    def setUp(self):
+        cache.clear()
+
     def test_valid_post_saves_and_redirects(self):
         response = self.client.post("/contactme/", VALID_CONTACT, follow=False)
         self.assertEqual(response.status_code, 302)
@@ -58,6 +62,13 @@ class ContactFormTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Too many messages")
         self.assertEqual(Message.objects.count(), 3)
+
+    def test_invalid_posts_do_not_consume_rate_limit(self):
+        for _ in range(4):
+            self.client.post("/contactme/", {"first_name": "Ada"})
+        response = self.client.post("/contactme/", VALID_CONTACT, follow=False)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(Message.objects.count(), 1)
 
     def test_honeypot_discards_bot_post(self):
         response = self.client.post(

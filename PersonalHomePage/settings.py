@@ -72,6 +72,9 @@ SECRET_KEY = _secret_key
 # e.g. ALLOWED_HOSTS=example.com,www.example.com
 # Empty list fail-closes (Django denies every Host). That is intentional.
 ALLOWED_HOSTS = env_list('ALLOWED_HOSTS')
+# Railway probes /health/ with this Host. Harmless if unused locally.
+if 'healthcheck.railway.app' not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append('healthcheck.railway.app')
 
 # Railway / any TLS-terminating proxy. Trust X-Forwarded-Proto so secure
 # cookies and CSRF work behind https://mslevin.dev.
@@ -85,10 +88,16 @@ _csrf_origins = env_list('CSRF_TRUSTED_ORIGINS')
 if _csrf_origins:
     CSRF_TRUSTED_ORIGINS = _csrf_origins
 else:
-    CSRF_TRUSTED_ORIGINS = [
-        f'https://{host}' for host in ALLOWED_HOSTS
-        if host and host not in {'localhost', '127.0.0.1', '[::1]'}
-    ]
+    CSRF_TRUSTED_ORIGINS = []
+    for host in ALLOWED_HOSTS:
+        if not host or host in {'localhost', '127.0.0.1', '[::1]', 'healthcheck.railway.app'}:
+            continue
+        if host.startswith('.'):
+            CSRF_TRUSTED_ORIGINS.append(f'https://*{host}')
+        elif host.startswith('*.'):
+            CSRF_TRUSTED_ORIGINS.append(f'https://{host}')
+        else:
+            CSRF_TRUSTED_ORIGINS.append(f'https://{host}')
     if DEBUG:
         CSRF_TRUSTED_ORIGINS.extend(
             [
@@ -109,7 +118,7 @@ EMAIL_HOST_USER = env('EMAIL_HOST_USER', '')  # email address that will be used 
 
 EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD', '')  # password of the email-id
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_BACKEND = env('EMAIL_BACKEND') or 'django.core.mail.backends.smtp.EmailBackend'
 
 EMAIL_HOST = 'smtp.gmail.com'
 
@@ -194,7 +203,7 @@ WSGI_APPLICATION = 'PersonalHomePage.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': env('DATABASE_PATH', default=BASE_DIR / 'db.sqlite3'),
+        'NAME': env('DATABASE_PATH') or (BASE_DIR / 'db.sqlite3'),
     }
 }
 
@@ -256,6 +265,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CSRF_COOKIE_SECURE = not DEBUG
 SESSION_COOKIE_SECURE = not DEBUG
 SECURE_SSL_REDIRECT = env_bool('SECURE_SSL_REDIRECT', default=not DEBUG)
+SECURE_REDIRECT_EXEMPT = [r'^health/$', r'^healthcheck/$']
+SERVER_EMAIL = env('SERVER_EMAIL') or env('ADMIN_EMAIL') or 'webmaster@localhost'
+DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL') or EMAIL_HOST_USER or SERVER_EMAIL
 if not DEBUG:
     SECURE_HSTS_SECONDS = int(env('SECURE_HSTS_SECONDS') or '31536000')
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True

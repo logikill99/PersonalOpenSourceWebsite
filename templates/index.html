@@ -28,9 +28,9 @@
             <small>{{ image_caption }}</small>
         </div>
             <div class="about-me-text">
-                <p>Hi, I'm {{ name }}. I'm a {{ in_text_title }} currently working for
-                    <a class="interactive-text" href="https://www.nextech.com" target="_blank" rel="noopener">Nextech Systems</a>&nbsp; I recently recieved my B.S. in Computer Science from 
-                    <a class="interactive-text" href="https://loyno.edu">Loyola University New Orleans</a>&nbsp and graduated with a 3.789 GPA.
+                <p>Hi, I'm {{ name }}. I'm a {{ title|default:in_text_title }} currently working for
+                    <a class="interactive-text" href="https://www.nextech.com" target="_blank" rel="noopener">Nextech Systems</a>. I recently received my B.S. in Computer Science from
+                    <a class="interactive-text" href="https://loyno.edu">Loyola University New Orleans</a> and graduated with a 3.789 GPA.
                 </p>
                 <p>I specialize in:</p>
                 <div class="skills-list">
@@ -56,7 +56,7 @@
             <div class="flexwrap-container">
             {% for project in projects %}
                 <div class="project">
-                    <h3>{{ project.title }}</h3><p>{{ project.body|slice:":400" }}... <a href="{% url 'blog_detail' project.pk %}" class="interactive-text">Read more</a></p>
+                    <h3>{{ project.title }}</h3><p>{{ project.body|striptags|truncatechars:400 }} <a href="{% url 'blog_detail' project.pk %}" class="interactive-text">Read more</a></p>
                     <a class="clickable-div"  href="{% url 'blog_detail' project.pk %}"></a>
                 </div>
             {% endfor %}

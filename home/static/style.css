@@ -603,3 +603,70 @@ body {
     color: var(--secondary-text-color);
     transition: background-color 0.3s;
 }
+
+.site-form {
+    max-width: 40rem;
+}
+
+.site-form p {
+    margin: 0 0 1rem;
+}
+
+.site-form label {
+    display: block;
+    margin-bottom: 0.35rem;
+    color: var(--secondary-text-color);
+}
+
+.site-form input,
+.site-form textarea,
+.site-form select,
+.form-control {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0.65rem 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    background-color: var(--header-bg-color);
+    color: var(--text-color);
+    font: inherit;
+}
+
+.site-form textarea,
+.form-control {
+    min-height: 8rem;
+}
+
+.site-form button,
+.comments .btn {
+    margin-top: 0.5rem;
+}
+
+.errorlist {
+    list-style: none;
+    margin: 0 0 0.4rem;
+    padding: 0;
+    color: #e07a5f;
+}
+
+.messages {
+    list-style: none;
+    margin: 0 0 1rem;
+    padding: 0;
+}
+
+.messages li {
+    padding: 0.6rem 0.75rem;
+    border-radius: 5px;
+    background-color: var(--header-bg-color);
+    color: var(--header-text-color);
+}
+
+.hp {
+    position: absolute;
+    left: -10000px;
+    top: auto;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+}
