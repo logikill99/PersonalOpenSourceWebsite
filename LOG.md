@@ -22,8 +22,8 @@
 
 ### Deploy Checklist
 1. Mount Railway volume at `/data`.
-2. Copy `prod-import/db.seed.sqlite3` to `/data/db.sqlite3` on the volume.
-3. Set env vars: `DATABASE_PATH=/data/db.sqlite3`, `DJANGO_SUPERUSER_USERNAME`, `DJANGO_SUPERUSER_PASSWORD`, `DJANGO_SUPERUSER_EMAIL`.
+2. Copy the **local-only** sanitized seed (`prod-import/db.seed.sqlite3` on slab, not in git) to `/data/db.sqlite3` on the volume.
+3. Set env vars: `SECRET_KEY`, `ALLOWED_HOSTS`, `DEBUG=False`, `DATABASE_PATH=/data/db.sqlite3`, plus `DJANGO_SUPERUSER_*` if you want a fresh admin user.
 4. Redeploy. `entrypoint.sh` will run migrations and create the superuser if credentials are present.
 
 ---
@@ -50,4 +50,23 @@
 
 ---
 
-*Log maintained by Wren. Last updated: 2026-08-10.*
+## 2026-08-17 — salvage without Wren
+
+Wren iced 2026-08-16. Matt asked to get the website code where it needs to be.
+Morgan pushed the local-only modernize tips to origin so they are not hostage
+to the hermes-wren sandbox disk:
+
+- `origin/modernize/settings` @ `8174dbd`
+- `origin/modernize/django6-deps` @ `fe931b9`
+- `origin/modernize/alpine-accordion` @ `976862d`
+
+Then opened `salvage/railway-hardening` from the alpine tip with the leftover
+audit fixes. PR #19 (`reconcile/prod-baseline`) is an incomplete intermediate
+and should stay closed or be superseded. Do not merge #19 as the deploy PR.
+
+Honest leftover facts:
+- `prod-import/db.seed.sqlite3` is local-only. It was never in any git tree.
+- Public `main` still tracks `.env` (`7b0fd2b`). History purge is a separate job.
+- Railway project exists; nothing is deployed. DNS cutover is not in this PR.
+
+*Log continued by Morgan. Last updated: 2026-08-17.*

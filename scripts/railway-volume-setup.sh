@@ -72,8 +72,12 @@ echo "Volume state after run:"
 cat <<EOF
 
 Next steps (not automated here on purpose):
-1. settings.py must read DATABASE_PATH (default /data/db.sqlite3) - tracked in
-   the modernization/deploy track, NOT this task.
-2. Seed the volume with prod-import/db.seed.sqlite3 - task t_c5e51d0c.
-3. Redeploy the service so the mount takes effect: railway up / redeploy.
+1. Set DATABASE_PATH=/data/db.sqlite3 on the Railway service.
+2. Seed the volume from the LOCAL sanitized copy at
+   /home/slab/sandboxes/hermes-wren/work/prod-import/db.seed.sqlite3
+   That file is intentionally NOT in git (PII hygiene). Do not invent a
+   repo path for it. If the file is missing, stop; do not ship an empty DB.
+3. Required env: SECRET_KEY, ALLOWED_HOSTS=mslevin.dev,www.mslevin.dev,
+   DEBUG=False, plus DJANGO_SUPERUSER_* if you want a fresh admin user.
+4. Redeploy the service so the mount takes effect: railway up / redeploy.
 EOF

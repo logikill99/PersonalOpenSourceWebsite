@@ -10,7 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
-import warnings
+import sys
 from pathlib import Path
 
 from django.core.exceptions import ImproperlyConfigured
@@ -58,27 +58,46 @@ def env_list(name: str, default: list[str] | None = None) -> list[str]:
 DEBUG = env_bool('DEBUG', default=False)
 
 # SECURITY WARNING: keep the secret key used in production secret!
+# Always required. DEBUG=True is not an excuse for a baked-in key that can
+# leak into a Railway image if someone flips the wrong env var.
 _secret_key = env('SECRET_KEY')
 if not _secret_key:
-    if DEBUG:
-        # Insecure fallback for local dev ONLY. Never usable in production
-        # because production must run with DEBUG=False.
-        _secret_key = 'django-insecure-dev-only-key-do-not-use-in-production'
-        warnings.warn(
-            'SECRET_KEY is not set; using an insecure development key. '
-            'Set SECRET_KEY in your .env before deploying.',
-            stacklevel=2,
-        )
-    else:
-        raise ImproperlyConfigured(
-            'SECRET_KEY environment variable is required when DEBUG=False. '
-            'Refusing to start without it.'
-        )
+    raise ImproperlyConfigured(
+        'SECRET_KEY environment variable is required. '
+        'Refusing to start without it.'
+    )
 SECRET_KEY = _secret_key
 
 # Comma-separated list of host/domain names this site can serve.
 # e.g. ALLOWED_HOSTS=example.com,www.example.com
+# Empty list fail-closes (Django denies every Host). That is intentional.
 ALLOWED_HOSTS = env_list('ALLOWED_HOSTS')
+
+# Railway / any TLS-terminating proxy. Trust X-Forwarded-Proto so secure
+# cookies and CSRF work behind https://mslevin.dev.
+if env_bool('TRUST_PROXY', default=not DEBUG):
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    USE_X_FORWARDED_HOST = True
+
+# Explicit origins preferred. If unset, derive https:// from ALLOWED_HOSTS
+# so a Railway deploy with ALLOWED_HOSTS=mslevin.dev,www.mslevin.dev works.
+_csrf_origins = env_list('CSRF_TRUSTED_ORIGINS')
+if _csrf_origins:
+    CSRF_TRUSTED_ORIGINS = _csrf_origins
+else:
+    CSRF_TRUSTED_ORIGINS = [
+        f'https://{host}' for host in ALLOWED_HOSTS
+        if host and host not in {'localhost', '127.0.0.1', '[::1]'}
+    ]
+    if DEBUG:
+        CSRF_TRUSTED_ORIGINS.extend(
+            [
+                'http://localhost',
+                'http://127.0.0.1',
+                'http://localhost:8000',
+                'http://127.0.0.1:8000',
+            ]
+        )
 
 # Django 6.0 deprecates ADMINS as a list of (name, email) tuples; use the
 # "Name <email>" string format (or bare email) instead.
@@ -233,6 +252,25 @@ STORAGES = {
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CSRF_COOKIE_SECURE = True
+# Secure cookies in production. Local DEBUG keeps them off so http://localhost works.
+CSRF_COOKIE_SECURE = not DEBUG
+SESSION_COOKIE_SECURE = not DEBUG
+SECURE_SSL_REDIRECT = env_bool('SECURE_SSL_REDIRECT', default=not DEBUG)
+if not DEBUG:
+    SECURE_HSTS_SECONDS = int(env('SECURE_HSTS_SECONDS') or '31536000')
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = env_bool('SECURE_HSTS_PRELOAD', default=False)
 
-SESSION_COOKIE_SECURE = True
+# manage.py test / pytest should not require a collected manifest or HTTPS.
+TESTING = env_bool('DJANGO_TEST', default=False) or any(
+    arg in sys.argv for arg in ('test', 'pytest')
+)
+if TESTING:
+    STORAGES['staticfiles'] = {
+        'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage',
+    }
+    SECURE_SSL_REDIRECT = False
+    CSRF_COOKIE_SECURE = False
+    SESSION_COOKIE_SECURE = False
+    if not ALLOWED_HOSTS:
+        ALLOWED_HOSTS = ['testserver', 'localhost', '127.0.0.1']

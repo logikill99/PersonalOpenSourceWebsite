@@ -12,10 +12,21 @@
 {% block page_content %}
     <section id="contact">
     <h2>Contact Me</h2>
+        {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
         <form method="post">
             {% csrf_token %}
             {{ contact_form.as_p }}
             {{ message_form.as_p }}
+            <p class="hp" aria-hidden="true" style="position:absolute;left:-10000px;top:auto;width:1px;height:1px;overflow:hidden;">
+                <label for="id_website">Website</label>
+                <input type="text" name="website" id="id_website" value="" tabindex="-1" autocomplete="off">
+            </p>
             <button type="submit">Submit</button>
         </form>
     </section>
