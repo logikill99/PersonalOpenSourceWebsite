@@ -183,6 +183,58 @@ class RateLimitClientIPTests(TestCase):
             )
         self.assertContains(response, "Too many messages")
 
+    def test_untrusted_peer_xff_ignored_for_trust_sensitive_calls(self):
+        from PersonalHomePage.ratelimit import client_ip
+
+        with self.settings(TRUST_PROXY=True, TRUSTED_PROXY_IPS=["192.0.2.0/24"]):
+            request = self._request(remote="198.51.100.9", xff="203.0.113.7")
+            # The limiter stays permissive (over-restricting it is a self-DoS)...
+            self.assertEqual(client_ip(request), "203.0.113.7")
+            # ...but an access-control caller refuses the header outright.
+            self.assertEqual(
+                client_ip(request, require_trusted_peer=True), "198.51.100.9"
+            )
+
+    def test_default_trusted_proxies_cover_private_peers(self):
+        from PersonalHomePage.ratelimit import client_ip
+
+        with self.settings(TRUST_PROXY=True, TRUSTED_PROXY_IPS=[]):
+            private_peer = self._request(remote="172.17.0.1", xff="1.1.1.1, 203.0.113.7")
+            self.assertEqual(
+                client_ip(private_peer, require_trusted_peer=True), "203.0.113.7"
+            )
+            public_peer = self._request(remote="198.51.100.9", xff="203.0.113.7")
+            self.assertEqual(
+                client_ip(public_peer, require_trusted_peer=True), "198.51.100.9"
+            )
+
+    def test_invalid_trusted_proxy_entry_fails_fast(self):
+        from django.core.exceptions import ImproperlyConfigured
+
+        from PersonalHomePage.ratelimit import trusted_proxy_networks
+
+        with self.settings(TRUSTED_PROXY_IPS=["banana"]):
+            with self.assertRaises(ImproperlyConfigured):
+                trusted_proxy_networks()
+
+    def test_blocked_requests_do_not_write_to_the_cache(self):
+        """An already-throttled flood should not cost one SQLite cache write
+        per request."""
+        from django.core.cache import cache
+        from django.test import RequestFactory
+
+        from PersonalHomePage.ratelimit import is_rate_limited
+
+        cache.clear()
+        request = RequestFactory().post("/", REMOTE_ADDR="9.9.9.9")
+        for _ in range(3):
+            self.assertFalse(is_rate_limited(request, key_prefix="unit", record=True))
+        stored = cache.get("unit:9.9.9.9")
+        self.assertEqual(len(stored), 3)
+        for _ in range(5):
+            self.assertTrue(is_rate_limited(request, key_prefix="unit", record=True))
+        self.assertEqual(cache.get("unit:9.9.9.9"), stored)
+
     def test_database_cache_backend_is_active(self):
         # Guards against a silent fallback to LocMemCache, which is
         # per-process and would multiply the limit by the worker count.
@@ -259,6 +311,67 @@ class AdminAccessMiddlewareTests(TestCase):
             )
             self.assertEqual(response.status_code, 404)
 
+    def test_spoofed_xff_does_not_grant_admin_access_under_trust_proxy(self):
+        """Regression: production runs TRUST_PROXY=True (settings.py derives it
+        from `not DEBUG`), and the old test only asserted safety with it off —
+        a configuration production never uses. With TRUST_PROXY on and an
+        untrusted socket peer, a single `X-Forwarded-For: <allowlisted ip>`
+        header used to turn the allowlist off entirely."""
+        with self.settings(
+            ADMIN_IP_ALLOWLIST=["203.0.113.7"],
+            TRUST_PROXY=True,
+            TRUSTED_PROXY_IPS=["192.0.2.10"],  # our peer is 198.51.100.9, not this
+        ):
+            for spoof in ("203.0.113.7", "1.1.1.1, 203.0.113.7", "203.0.113.7, 203.0.113.7"):
+                with self.subTest(xff=spoof):
+                    response = self.client.get(
+                        "/admin/login/",
+                        REMOTE_ADDR="198.51.100.9",
+                        HTTP_X_FORWARDED_FOR=spoof,
+                    )
+                    self.assertEqual(response.status_code, 404)
+
+    def test_trusted_proxy_peer_may_still_vouch_for_admin_access(self):
+        """The fix must not break the real deployment: when the socket peer IS
+        the configured edge, its rightmost X-Forwarded-For entry still decides."""
+        with self.settings(
+            ADMIN_IP_ALLOWLIST=["203.0.113.7"],
+            TRUST_PROXY=True,
+            TRUSTED_PROXY_IPS=["192.0.2.0/24"],
+        ):
+            allowed = self.client.get(
+                "/admin/login/",
+                REMOTE_ADDR="192.0.2.10",
+                HTTP_X_FORWARDED_FOR="1.1.1.1, 203.0.113.7",
+            )
+            self.assertEqual(allowed.status_code, 200)
+            # ...and a client forging an entry to the LEFT of the real one
+            # still loses, because only the rightmost entry is read.
+            denied = self.client.get(
+                "/admin/login/",
+                REMOTE_ADDR="192.0.2.10",
+                HTTP_X_FORWARDED_FOR="203.0.113.7, 8.8.8.8",
+            )
+            self.assertEqual(denied.status_code, 404)
+
+    def test_bare_admin_path_is_404_when_not_allowlisted(self):
+        """`/admin` (no trailing slash) must not 301 to `/admin/`: that
+        confirms the admin exists to a client the allowlist is hiding it from."""
+        with self.settings(ADMIN_IP_ALLOWLIST=["203.0.113.7"]):
+            self.assertEqual(self.client.get("/admin").status_code, 404)
+        # Without an allowlist it behaves normally (CommonMiddleware 301).
+        self.assertEqual(self.client.get("/admin").status_code, 301)
+
+    def test_admin_responses_carry_noindex(self):
+        response = self.client.get("/admin/login/")
+        self.assertEqual(response["X-Robots-Tag"], "noindex, nofollow")
+
+    def test_robots_txt_does_not_advertise_admin(self):
+        """robots.txt naming /admin/ contradicted the middleware's stated goal
+        of not advertising the admin's existence."""
+        body = self.client.get("/robots.txt").content.decode()
+        self.assertNotIn("/admin", body)
+
     def test_admin_login_posts_rate_limited(self):
         for _ in range(3):
             self.client.post(
@@ -266,6 +379,30 @@ class AdminAccessMiddlewareTests(TestCase):
             )
         response = self.client.post(
             "/admin/login/", {"username": "x", "password": "y"}
+        )
+        self.assertEqual(response.status_code, 429)
+
+    def test_successful_admin_logins_do_not_consume_the_limit(self):
+        """Only failed logins are counted, so the owner cannot lock themselves
+        out by signing in a few times inside one minute."""
+        from django.contrib.auth import get_user_model
+
+        get_user_model().objects.create_superuser(
+            username="owner", email="o@example.com", password="Correct-Horse-9!"
+        )
+        for _ in range(4):
+            response = self.client.post(
+                "/admin/login/",
+                {"username": "owner", "password": "Correct-Horse-9!", "next": "/admin/"},
+            )
+            self.assertEqual(response.status_code, 302)
+            self.client.logout()
+
+    def test_failed_admin_logins_still_throttle(self):
+        for _ in range(3):
+            self.client.post("/admin/login/", {"username": "owner", "password": "nope"})
+        response = self.client.post(
+            "/admin/login/", {"username": "owner", "password": "nope"}
         )
         self.assertEqual(response.status_code, 429)
 

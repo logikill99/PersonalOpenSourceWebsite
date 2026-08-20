@@ -86,6 +86,14 @@ if TRUST_PROXY:
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     USE_X_FORWARDED_HOST = True
 
+# Which socket peers may vouch for a client IP via X-Forwarded-For. Empty =
+# use ratelimit._DEFAULT_TRUSTED_PROXY_IPS (loopback + RFC1918 + CGNAT + IPv6
+# ULA/link-local), which is what a container behind a platform edge sees.
+# Only consulted when TRUST_PROXY is on. Set explicitly if your edge reaches
+# the container from a public address; `0.0.0.0/0,::/0` restores the old
+# trust-anything behaviour. See PersonalHomePage/ratelimit.py.
+TRUSTED_PROXY_IPS = env_list('TRUSTED_PROXY_IPS')
+
 # Explicit origins preferred. If unset, derive https:// from ALLOWED_HOSTS
 # so a Railway deploy with ALLOWED_HOSTS=mslevin.dev,www.mslevin.dev works.
 _csrf_origins = env_list('CSRF_TRUSTED_ORIGINS')
