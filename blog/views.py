@@ -23,8 +23,11 @@ def blog_detail(request, pk: int):
                     body=form.cleaned_data["body"],
                     post=post,
                 )
+                messages.success(
+                    request, "Thanks! Your comment is awaiting moderation."
+                )
                 return HttpResponseRedirect(request.path_info)
-    comments = Comment.objects.filter(post=post)
+    comments = Comment.objects.filter(post=post, approved=True)
     context = {"post": post, "comments": comments, "form": form}
     return render(request, "post_detail.html", context)
 

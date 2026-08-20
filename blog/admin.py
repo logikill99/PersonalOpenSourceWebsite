@@ -3,15 +3,20 @@ from django.contrib import admin
 from blog.models import Category, Comment, Post
 
 
-# Register your models here.
 @admin.register(Category)
-class CommentAdmin(admin.ModelAdmin):
+class CategoryAdmin(admin.ModelAdmin):
     pass
 
 
 @admin.register(Comment)
 class CommentAdmin(admin.ModelAdmin):
-    pass
+    list_display = ("author", "post", "created_on", "approved")
+    list_filter = ("approved",)
+    actions = ("approve_comments",)
+
+    @admin.action(description="Approve selected comments")
+    def approve_comments(self, request, queryset):
+        queryset.update(approved=True)
 
 
 @admin.register(Post)

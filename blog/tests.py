@@ -28,6 +28,29 @@ class BlogViewTests(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(Comment.objects.count(), 0)
 
+    def test_new_comment_is_held_for_moderation(self):
+        response = self.client.post(
+            f"/blog/post/{self.post.pk}/",
+            {"author": "Ada", "body": "great post"},
+            follow=True,
+        )
+        self.assertContains(response, "awaiting moderation")
+        comment = Comment.objects.get()
+        self.assertFalse(comment.approved)
+        # Unapproved comment must not be publicly visible.
+        self.assertNotContains(response, "great post")
+
+    def test_approved_comment_is_displayed(self):
+        Comment.objects.create(
+            author="Ada", body="approved words", post=self.post, approved=True
+        )
+        Comment.objects.create(
+            author="Bot", body="held words", post=self.post, approved=False
+        )
+        response = self.client.get(f"/blog/post/{self.post.pk}/")
+        self.assertContains(response, "approved words")
+        self.assertNotContains(response, "held words")
+
     def test_comment_rate_limit_after_valid_posts(self):
         for _ in range(3):
             self.client.post(
