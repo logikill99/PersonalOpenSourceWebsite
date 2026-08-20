@@ -83,6 +83,48 @@ class SettingsFailClosedTests(SimpleTestCase):
         self.assertIn("SECRET_KEY", result.stderr)
 
 
+class EmailBackendOverrideTests(SimpleTestCase):
+    """Regression: EMAIL_BACKEND was assigned from env, then unconditionally
+    overwritten to SMTP further down settings.py, so the env override never
+    took effect."""
+
+    def _backend_with_env(self, extra_env):
+        repo = Path(__file__).resolve().parent.parent
+        env = os.environ.copy()
+        env.update(
+            {
+                "SECRET_KEY": "unit-test-key",
+                "ALLOWED_HOSTS": "localhost",
+                "PYTHONPATH": str(repo),
+                **extra_env,
+            }
+        )
+        result = subprocess.run(
+            [
+                sys.executable,
+                "-c",
+                "import PersonalHomePage.settings as s; print(s.EMAIL_BACKEND)",
+            ],
+            cwd=repo,
+            env=env,
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        return result.stdout.strip()
+
+    def test_env_override_wins(self):
+        backend = self._backend_with_env(
+            {"EMAIL_BACKEND": "django.core.mail.backends.console.EmailBackend"}
+        )
+        self.assertEqual(backend, "django.core.mail.backends.console.EmailBackend")
+
+    def test_default_is_smtp(self):
+        env = {"EMAIL_BACKEND": ""}
+        backend = self._backend_with_env(env)
+        self.assertEqual(backend, "django.core.mail.backends.smtp.EmailBackend")
+
+
 class ProxySettingsSmokeTests(SimpleTestCase):
     def test_csrf_origins_derived_from_allowed_hosts(self):
         self.assertTrue(hasattr(project_settings, "CSRF_TRUSTED_ORIGINS"))

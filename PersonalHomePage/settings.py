@@ -118,6 +118,8 @@ EMAIL_HOST_USER = env('EMAIL_HOST_USER', '')  # email address that will be used 
 
 EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD', '')  # password of the email-id
 
+# Overridable so local dev can use the console backend without SMTP creds.
+# e.g. EMAIL_BACKEND=django.core.mail.backends.console.EmailBackend
 EMAIL_BACKEND = env('EMAIL_BACKEND') or 'django.core.mail.backends.smtp.EmailBackend'
 
 EMAIL_HOST = 'smtp.gmail.com'
@@ -162,8 +164,6 @@ INSTALLED_APPS = [
     "contactme.apps.ContactmeConfig",
     "phonenumber_field",
 ]
-
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
