@@ -175,3 +175,57 @@ Suite: 40 tests green. `check --deploy --fail-level WARNING`: zero issues.
 - Approve/deny held comments at /admin/blog/comment/ (filter: unapproved).
 
 *Hardening pass by Claude (fable) under AGENTS.md, 2026-08-20.*
+
+## 2026-08-20 later — independent adversarial review of the hardening pass
+
+Full write-up: **`docs/audits/adversarial-smoke-review-2026-08-20.md`** — smoke
+results for every public path, the attack log (CSRF matrix, XFF spoofing, XSS,
+header injection, host header, traversal, mass assignment, 40-way parallel POSTs),
+ranked code-review findings, residual risks, and the deploy verdict.
+
+Reviewed by a second agent that did not write the hardening, treating the branch as
+untrusted. Verdict: **ready for Railway deploy, code-side — conditionally** (see the
+audit's §6 for the four conditions). No CRITICAL findings. Most of the pass held up
+under attack: the Docker privilege drop, moderation queue, PII elimination, shared
+DatabaseCache limiter, header/cookie posture and release gate are all real and were
+re-verified independently.
+
+Two HIGH findings, both fixed here:
+
+- **Admin IP allowlist was bypassable with one header.** `client_ip()` read the
+  rightmost `X-Forwarded-For` entry whenever `TRUST_PROXY` was on (production), but
+  never asked whether a proxy had appended anything. Against the built image with
+  `ADMIN_IP_ALLOWLIST=203.0.113.7`, `curl -H 'X-Forwarded-For: 203.0.113.7'` got
+  **200 instead of 404**. New `TRUSTED_PROXY_IPS` setting now requires the socket
+  peer to be a known proxy before its forwarded headers are believed for
+  access-control decisions. **If /admin/ ever 404s you with a correct allowlist,
+  grep the logs for `not in TRUSTED_PROXY_IPS` and put the logged peer there.**
+- **A blank boolean env var refused the boot.** `env_bool("")` returned False, so the
+  `TRUST_PROXY=` / `SECURE_SSL_REDIRECT=` / `SECURE_HSTS_PRELOAD=` shape that
+  `.env.example` documents (and that Railway stores for blank variables) tripped
+  `check --deploy` in `entrypoint.sh` — a crashloop from following our own docs.
+  Blank now means "use the default".
+
+Also fixed: the enforced CSP was blocking the Google Fonts `@import` in
+`style.css:3` on **every** page (site was silently rendering in fallback
+sans-serif); `robots.txt` advertised `Disallow: /admin/` while `middleware.py`
+claimed not to advertise the admin (now `X-Robots-Tag: noindex` instead); bare
+`/admin` skipped the allowlist and 301'd, leaking the admin's existence; the login
+limiter counted *successful* logins so four sign-ins in a minute locked the owner
+out; `sqlparse` bumped to 0.6.0 for four advisories.
+
+Three LOG.md claims above were overclaims — recorded in the audit's "claims vs code
+reality" section rather than edited out of the log: the suite had **zero** CSRF
+coverage (every POST test used the default client, which disables CSRF checks); the
+"no CSP violations" browser check missed a violation present on every page; and the
+rightmost-XFF reasoning closed the ordering question but not the trust question.
+
+Suite: 40 → **68 tests**, green. `check --deploy --fail-level WARNING` clean inside
+the running container. Every fix re-attacked against a rebuilt image.
+
+Open, deliberately not fixed (rationale in the audit): per-IP rate limiting cannot
+stop a botnet or an IPv6 /64; `/static/admin/*` still hints the admin exists;
+`'unsafe-eval'` + whole-of-jsdelivr in `script-src`; self-hosting Roboto and Alpine
+would drop three external origins from the CSP.
+
+*Independent review by Claude (opus) under AGENTS.md, 2026-08-20.*
