@@ -172,6 +172,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.middleware.csp.ContentSecurityPolicyMiddleware',
+    'PersonalHomePage.middleware.AdminAccessMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -180,6 +181,10 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+# Optional: restrict /admin/ to these IPs/CIDRs (comma-separated). Unset
+# leaves the admin reachable (login still rate limited); see middleware.py.
+ADMIN_IP_ALLOWLIST = env_list('ADMIN_IP_ALLOWLIST')
 
 ROOT_URLCONF = 'PersonalHomePage.urls'
 

@@ -226,6 +226,60 @@ class SecurityHeaderTests(TestCase):
         self.assertEqual(live_settings.CSRF_COOKIE_SAMESITE, "Lax")
 
 
+class AdminAccessMiddlewareTests(TestCase):
+    def setUp(self):
+        from django.core.cache import cache
+
+        cache.clear()
+
+    def test_admin_open_when_allowlist_unset(self):
+        response = self.client.get("/admin/login/")
+        self.assertEqual(response.status_code, 200)
+
+    def test_allowlisted_ip_gets_admin(self):
+        with self.settings(ADMIN_IP_ALLOWLIST=["127.0.0.1", "10.0.0.0/8"]):
+            response = self.client.get("/admin/login/")
+            self.assertEqual(response.status_code, 200)
+            response = self.client.get("/admin/login/", REMOTE_ADDR="10.1.2.3")
+            self.assertEqual(response.status_code, 200)
+
+    def test_non_allowlisted_ip_gets_404(self):
+        with self.settings(ADMIN_IP_ALLOWLIST=["203.0.113.7"]):
+            response = self.client.get("/admin/login/")
+            self.assertEqual(response.status_code, 404)
+            # Non-admin pages unaffected.
+            self.assertEqual(self.client.get("/").status_code, 200)
+
+    def test_spoofed_xff_does_not_grant_admin_access(self):
+        with self.settings(
+            ADMIN_IP_ALLOWLIST=["203.0.113.7"], TRUST_PROXY=False
+        ):
+            response = self.client.get(
+                "/admin/login/", HTTP_X_FORWARDED_FOR="203.0.113.7"
+            )
+            self.assertEqual(response.status_code, 404)
+
+    def test_admin_login_posts_rate_limited(self):
+        for _ in range(3):
+            self.client.post(
+                "/admin/login/", {"username": "x", "password": "y"}
+            )
+        response = self.client.post(
+            "/admin/login/", {"username": "x", "password": "y"}
+        )
+        self.assertEqual(response.status_code, 429)
+
+    def test_invalid_allowlist_entry_fails_fast(self):
+        from django.core.exceptions import ImproperlyConfigured
+        from django.test import override_settings
+
+        from PersonalHomePage.middleware import AdminAccessMiddleware
+
+        with override_settings(ADMIN_IP_ALLOWLIST=["not-an-ip"]):
+            with self.assertRaises(ImproperlyConfigured):
+                AdminAccessMiddleware(lambda r: None)
+
+
 class ProxySettingsSmokeTests(SimpleTestCase):
     def test_csrf_origins_derived_from_allowed_hosts(self):
         self.assertTrue(hasattr(project_settings, "CSRF_TRUSTED_ORIGINS"))
