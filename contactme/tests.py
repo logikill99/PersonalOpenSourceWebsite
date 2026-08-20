@@ -100,3 +100,75 @@ class ContactFormTests(TestCase):
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(mail.outbox), 0)
+
+
+@override_settings(
+    EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
+    EMAIL_HOST_USER="matt@example.com",
+    DEFAULT_FROM_EMAIL="matt@example.com",
+)
+class ContactCsrfTests(TestCase):
+    """CSRF was entirely unverified by the suite: every other test uses the
+    default test client, which disables CSRF checks. These use
+    enforce_csrf_checks=True so a regression that drops CsrfViewMiddleware,
+    marks the view csrf_exempt, or loosens CSRF_TRUSTED_ORIGINS is caught."""
+
+    def setUp(self):
+        from django.test import Client
+
+        cache.clear()
+        self.client = Client(enforce_csrf_checks=True)
+
+    def _token(self):
+        return self.client.get("/contactme/").cookies["csrftoken"].value
+
+    def test_valid_token_is_accepted(self):
+        token = self._token()
+        response = self.client.post(
+            "/contactme/", {**VALID_CONTACT, "csrfmiddlewaretoken": token}
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(len(mail.outbox), 1)
+
+    def test_missing_token_is_rejected(self):
+        self._token()
+        response = self.client.post("/contactme/", VALID_CONTACT)
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(len(mail.outbox), 0)
+
+    def test_forged_token_is_rejected(self):
+        self._token()
+        response = self.client.post(
+            "/contactme/", {**VALID_CONTACT, "csrfmiddlewaretoken": "A" * 64}
+        )
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(len(mail.outbox), 0)
+
+    def test_token_without_cookie_is_rejected(self):
+        token = self._token()
+        self.client.cookies.clear()
+        response = self.client.post(
+            "/contactme/", {**VALID_CONTACT, "csrfmiddlewaretoken": token}
+        )
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(len(mail.outbox), 0)
+
+    def test_cross_origin_referer_is_rejected_over_https(self):
+        token = self._token()
+        response = self.client.post(
+            "/contactme/",
+            {**VALID_CONTACT, "csrfmiddlewaretoken": token},
+            secure=True,
+            HTTP_REFERER="https://evil.example/x",
+        )
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(len(mail.outbox), 0)
+
+    def test_honeypot_still_requires_csrf(self):
+        """The honeypot short-circuit sits inside the view, so it must not be
+        reachable without a token."""
+        self._token()
+        response = self.client.post(
+            "/contactme/", {**VALID_CONTACT, "website": "https://spam.example"}
+        )
+        self.assertEqual(response.status_code, 403)
