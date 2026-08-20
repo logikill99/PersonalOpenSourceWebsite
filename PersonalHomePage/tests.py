@@ -337,6 +337,22 @@ class SecurityHeaderTests(TestCase):
         # The primary XSS hole CSP closes here: no inline script allowed.
         self.assertNotIn("unsafe-inline", csp)
 
+    def test_csp_allows_the_font_origins_the_css_imports(self):
+        """style.css:3 @imports the Roboto stylesheet from fonts.googleapis.com,
+        which then pulls the faces from fonts.gstatic.com. `style-src 'self'`
+        blocked that on every page and the site fell back to generic sans-serif
+        — found in headless Chrome, invisible to a header-only check."""
+        csp = self.client.get("/")["Content-Security-Policy"]
+        self.assertIn("https://fonts.googleapis.com", csp)
+        self.assertIn("https://fonts.gstatic.com", csp)
+        style_src = [d for d in csp.split(";") if d.strip().startswith("style-src")][0]
+        font_src = [d for d in csp.split(";") if d.strip().startswith("font-src")][0]
+        self.assertIn("https://fonts.googleapis.com", style_src)
+        self.assertIn("https://fonts.gstatic.com", font_src)
+        # The relaxation must stay scoped: no wildcards, no inline styles.
+        self.assertNotIn("unsafe-inline", csp)
+        self.assertNotIn("*", csp)
+
     def test_session_cookie_flags(self):
         from django.conf import settings as live_settings
 

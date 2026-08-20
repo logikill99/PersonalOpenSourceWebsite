@@ -315,13 +315,17 @@ CSRF_COOKIE_SAMESITE = 'Lax'
 #   x-data/x-show expressions with new Function(). It does NOT allow inline
 #   <script> injection — script-src still blocks the primary XSS vector,
 #   which matters because post bodies render with |safe.
+# - fonts.googleapis.com / fonts.gstatic.com serve the Roboto face that
+#   style.css @imports (line 3). Without them style-src blocked the import on
+#   every page and the site silently fell back to the generic sans-serif.
+#   Self-hosting the font would drop both origins; tracked as a follow-up.
 # - frame-ancestors 'none' mirrors X-Frame-Options: DENY.
 SECURE_CSP = {
     'default-src': [CSP.SELF],
     'script-src': [CSP.SELF, 'https://cdn.jsdelivr.net', CSP.UNSAFE_EVAL],
-    'style-src': [CSP.SELF],
+    'style-src': [CSP.SELF, 'https://fonts.googleapis.com'],
     'img-src': [CSP.SELF],
-    'font-src': [CSP.SELF],
+    'font-src': [CSP.SELF, 'https://fonts.gstatic.com'],
     'connect-src': [CSP.SELF],
     'object-src': [CSP.NONE],
     'base-uri': [CSP.SELF],
