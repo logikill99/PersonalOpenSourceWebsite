@@ -14,6 +14,7 @@ import sys
 from pathlib import Path
 
 from django.core.exceptions import ImproperlyConfigured
+from django.utils.csp import CSP
 from dotenv import load_dotenv
 from os import getenv as env
 from os import path
@@ -170,6 +171,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'django.middleware.csp.ContentSecurityPolicyMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -275,6 +277,37 @@ STORAGES = {
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# --- Security headers -------------------------------------------------------
+# Harmless in dev, so they are on everywhere; only HTTPS-dependent settings
+# (secure cookies, SSL redirect, HSTS) are gated on DEBUG below.
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
+X_FRAME_OPTIONS = 'DENY'
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = 'Lax'
+CSRF_COOKIE_SAMESITE = 'Lax'
+
+# Content-Security-Policy (Django 6 native middleware, enforced not
+# report-only). Relaxations, each deliberate:
+# - script-src allows the jsdelivr CDN for the pinned+SRI Alpine bundle.
+# - 'unsafe-eval' is required by the standard Alpine build, which compiles
+#   x-data/x-show expressions with new Function(). It does NOT allow inline
+#   <script> injection — script-src still blocks the primary XSS vector,
+#   which matters because post bodies render with |safe.
+# - frame-ancestors 'none' mirrors X-Frame-Options: DENY.
+SECURE_CSP = {
+    'default-src': [CSP.SELF],
+    'script-src': [CSP.SELF, 'https://cdn.jsdelivr.net', CSP.UNSAFE_EVAL],
+    'style-src': [CSP.SELF],
+    'img-src': [CSP.SELF],
+    'font-src': [CSP.SELF],
+    'connect-src': [CSP.SELF],
+    'object-src': [CSP.NONE],
+    'base-uri': [CSP.SELF],
+    'form-action': [CSP.SELF],
+    'frame-ancestors': [CSP.NONE],
+}
 
 # Secure cookies in production. Local DEBUG keeps them off so http://localhost works.
 CSRF_COOKIE_SECURE = not DEBUG

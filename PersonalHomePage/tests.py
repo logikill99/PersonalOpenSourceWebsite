@@ -194,6 +194,38 @@ class RateLimitClientIPTests(TestCase):
         )
 
 
+class SecurityHeaderTests(TestCase):
+    """Response headers every page must carry, DEBUG or not."""
+
+    def test_baseline_headers_on_home_page(self):
+        response = self.client.get("/")
+        self.assertEqual(response["X-Content-Type-Options"], "nosniff")
+        self.assertEqual(response["X-Frame-Options"], "DENY")
+        self.assertEqual(
+            response["Referrer-Policy"], "strict-origin-when-cross-origin"
+        )
+
+    def test_csp_header_present_and_sane(self):
+        response = self.client.get("/")
+        csp = response["Content-Security-Policy"]
+        self.assertIn("default-src 'self'", csp)
+        self.assertIn("https://cdn.jsdelivr.net", csp)
+        self.assertIn("frame-ancestors 'none'", csp)
+        self.assertIn("object-src 'none'", csp)
+        self.assertIn("form-action 'self'", csp)
+        # Enforced, not report-only.
+        self.assertNotIn("Content-Security-Policy-Report-Only", response.headers)
+        # The primary XSS hole CSP closes here: no inline script allowed.
+        self.assertNotIn("unsafe-inline", csp)
+
+    def test_session_cookie_flags(self):
+        from django.conf import settings as live_settings
+
+        self.assertTrue(live_settings.SESSION_COOKIE_HTTPONLY)
+        self.assertEqual(live_settings.SESSION_COOKIE_SAMESITE, "Lax")
+        self.assertEqual(live_settings.CSRF_COOKIE_SAMESITE, "Lax")
+
+
 class ProxySettingsSmokeTests(SimpleTestCase):
     def test_csrf_origins_derived_from_allowed_hosts(self):
         self.assertTrue(hasattr(project_settings, "CSRF_TRUSTED_ORIGINS"))
