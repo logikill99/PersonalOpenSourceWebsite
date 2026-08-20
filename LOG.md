@@ -198,8 +198,10 @@ Two HIGH findings, both fixed here:
   `ADMIN_IP_ALLOWLIST=203.0.113.7`, `curl -H 'X-Forwarded-For: 203.0.113.7'` got
   **200 instead of 404**. New `TRUSTED_PROXY_IPS` setting now requires the socket
   peer to be a known proxy before its forwarded headers are believed for
-  access-control decisions. **If /admin/ ever 404s you with a correct allowlist,
-  grep the logs for `not in TRUSTED_PROXY_IPS` and put the logged peer there.**
+  access-control decisions. Expected case (Railway's edge on a private address):
+  nothing changes and the allowlist just works. **Only if /admin/ 404s you with a
+  correct allowlist, grep the logs for `not in TRUSTED_PROXY_IPS` and put the
+  logged peer there — don't set it pre-emptively.**
 - **A blank boolean env var refused the boot.** `env_bool("")` returned False, so the
   `TRUST_PROXY=` / `SECURE_SSL_REDIRECT=` / `SECURE_HSTS_PRELOAD=` shape that
   `.env.example` documents (and that Railway stores for blank variables) tripped

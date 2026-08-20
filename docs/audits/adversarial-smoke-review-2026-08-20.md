@@ -679,11 +679,14 @@ The conditions, in order of importance:
 1. **`SECRET_KEY` must be freshly generated**, not carried from `main`'s history.
 2. **`DATABASE_PATH` must be set** to the mounted volume (e.g. `/data/db.sqlite3`).
    The image intentionally will not boot without it (I1).
-3. **After the first deploy, check the logs for `not in TRUSTED_PROXY_IPS`.** If it
-   appears, Railway's edge reaches the container from an address outside the default
-   private ranges: put that address in `TRUSTED_PROXY_IPS`. Until then the admin
-   allowlist would fail closed (Matt locked out) rather than fail open — the safe
-   direction, but it needs to be noticed.
+3. **After the first deploy, check the logs for `not in TRUSTED_PROXY_IPS`.** If
+   Railway's edge reaches the container from a private address — which is what the
+   §4 `pow-allow3` run simulates, and the expected case — the allowlist just works
+   and that line never appears. It only fires if the edge peer is outside the
+   default private ranges, and *then* the allowlist fails closed (Matt locked out)
+   rather than open. Safe direction, but it needs to be noticed: the fix is to put
+   the logged peer address into `TRUSTED_PROXY_IPS`. Do not set it pre-emptively —
+   a wrong value is how you'd cause the lockout you were trying to avoid.
 4. **`ADMIN_IP_ALLOWLIST` is worth setting now that it actually holds.** Before this
    audit it was bypassable with a single header (H1); it is a real control now.
 
