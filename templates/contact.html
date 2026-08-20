@@ -17,8 +17,7 @@
         {% endif %}
         <form method="post" class="site-form">
             {% csrf_token %}
-            {{ contact_form.as_p }}
-            {{ message_form.as_p }}
+            {{ form.as_p }}
             <p class="hp" aria-hidden="true">
                 <label for="id_website">Website</label>
                 <input type="text" name="website" id="id_website" value="" tabindex="-1" autocomplete="off">

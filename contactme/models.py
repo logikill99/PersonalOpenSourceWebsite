@@ -1,17 +1,3 @@
-from django.conf import settings
-from django.db import models
-from phonenumber_field.modelfields import PhoneNumberField
-
-
-# Create your models here.
-class Contact(models.Model):
-    first_name = models.CharField(max_length=30)
-    last_name = models.CharField(max_length=30)
-    email = models.EmailField(null=False, blank=False)
-    phone_number = PhoneNumberField(region=getattr(settings, 'REGION', 'US'))
-
-
-class Message(models.Model):
-    contact = models.ForeignKey(Contact, on_delete=models.CASCADE)
-    message = models.TextField()
-    time = models.DateTimeField(auto_now=True)
+# Intentionally empty. PII policy (2026-08-20, LOG.md): the contact form is
+# email-only — submissions are relayed via SMTP and never stored. The former
+# Contact/Message models were removed in migration 0003.

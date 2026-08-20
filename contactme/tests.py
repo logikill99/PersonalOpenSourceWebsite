@@ -2,9 +2,8 @@ from unittest.mock import patch
 
 from django.core import mail
 from django.core.cache import cache
+from django.db import connection
 from django.test import TestCase, override_settings
-
-from contactme.models import Contact, Message
 
 
 VALID_CONTACT = {
@@ -24,12 +23,21 @@ class ContactFormTests(TestCase):
     def setUp(self):
         cache.clear()
 
-    def test_valid_post_saves_and_redirects(self):
+    def test_valid_post_sends_email_and_redirects(self):
         response = self.client.post("/contactme/", VALID_CONTACT, follow=False)
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(Contact.objects.count(), 1)
-        self.assertEqual(Message.objects.count(), 1)
         self.assertEqual(len(mail.outbox), 1)
+        body = mail.outbox[0].body
+        self.assertIn("Ada Lovelace", body)
+        self.assertIn("ada@example.com", body)
+        self.assertIn("hello from the test suite", body)
+
+    def test_no_contact_tables_exist(self):
+        # PII policy: email-only, nothing persisted. The former
+        # contactme_contact / contactme_message tables must be gone.
+        tables = connection.introspection.table_names()
+        self.assertNotIn("contactme_contact", tables)
+        self.assertNotIn("contactme_message", tables)
 
     def test_email_failure_does_not_leak_exception(self):
         with patch(
@@ -45,44 +53,50 @@ class ContactFormTests(TestCase):
             )
         self.assertEqual(response.status_code, 200)
         self.assertNotIn(b"smtp exploded", response.content)
-        self.assertNotIn(b"Error:", response.content)
-        self.assertContains(response, "email delivery failed")
-        self.assertEqual(Contact.objects.count(), 1)
+        self.assertContains(response, "was not delivered")
+        # The visitor's message must survive into the re-rendered form so a
+        # retry does not lose it.
+        self.assertContains(response, "this should not echo smtp errors")
 
     def test_rate_limit_blocks_burst_posts(self):
-        payload = {
-            "first_name": "Ada",
-            "last_name": "Lovelace",
-            "email": "ada@example.com",
-            "message": "burst",
-        }
         for _ in range(3):
-            self.client.post("/contactme/", payload)
-        response = self.client.post("/contactme/", payload)
+            self.client.post("/contactme/", VALID_CONTACT)
+        response = self.client.post("/contactme/", VALID_CONTACT)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Too many messages")
-        self.assertEqual(Message.objects.count(), 3)
+        self.assertEqual(len(mail.outbox), 3)
 
     def test_invalid_posts_do_not_consume_rate_limit(self):
         for _ in range(4):
             self.client.post("/contactme/", {"first_name": "Ada"})
         response = self.client.post("/contactme/", VALID_CONTACT, follow=False)
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(Message.objects.count(), 1)
+        self.assertEqual(len(mail.outbox), 1)
 
     def test_honeypot_discards_bot_post(self):
         response = self.client.post(
             "/contactme/",
             {
-                "first_name": "Bot",
-                "last_name": "McSpam",
-                "email": "bot@example.com",
-                "message": "buy cheap pills",
+                **VALID_CONTACT,
                 "website": "https://spam.example",
             },
             follow=False,
         )
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(Contact.objects.count(), 0)
-        self.assertEqual(Message.objects.count(), 0)
+        self.assertEqual(len(mail.outbox), 0)
+
+    def test_oversized_message_rejected(self):
+        response = self.client.post(
+            "/contactme/",
+            {**VALID_CONTACT, "message": "x" * 5001},
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(mail.outbox), 0)
+
+    def test_header_injection_in_email_field_rejected(self):
+        response = self.client.post(
+            "/contactme/",
+            {**VALID_CONTACT, "email": "ada@example.com\nBcc: spam@evil.example"},
+        )
+        self.assertEqual(response.status_code, 200)
         self.assertEqual(len(mail.outbox), 0)
