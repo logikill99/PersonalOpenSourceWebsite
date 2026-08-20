@@ -8,6 +8,11 @@ if [ -n "$DATABASE_PATH" ]; then
     mkdir -p "$DB_DIR"
 fi
 
+# Release gate: refuse to boot a misconfigured production image. Any
+# `check --deploy` warning (missing HSTS, insecure cookies, weak
+# SECRET_KEY, DEBUG on, ...) is fatal here, not advisory.
+python3 manage.py check --deploy --fail-level WARNING
+
 # Apply database migrations
 python3 manage.py migrate --noinput
 

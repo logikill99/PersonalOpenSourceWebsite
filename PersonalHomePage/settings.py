@@ -319,7 +319,40 @@ DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL') or EMAIL_HOST_USER or SERVER_EMAI
 if not DEBUG:
     SECURE_HSTS_SECONDS = int(env('SECURE_HSTS_SECONDS') or '31536000')
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-    SECURE_HSTS_PRELOAD = env_bool('SECURE_HSTS_PRELOAD', default=False)
+    # Default True so `check --deploy --fail-level WARNING` (run by
+    # entrypoint.sh as a release gate) passes clean. The header alone only
+    # makes the domain *eligible* for browser preload lists; nothing is
+    # submitted automatically. Opt out with SECURE_HSTS_PRELOAD=False.
+    SECURE_HSTS_PRELOAD = env_bool('SECURE_HSTS_PRELOAD', default=True)
+
+# Logging: everything to stdout/stderr for Railway to collect. INFO by
+# default (no debug noise in prod); override with LOG_LEVEL=DEBUG locally.
+LOG_LEVEL = (env('LOG_LEVEL') or 'INFO').upper()
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'console': {
+            'format': '{levelname} {asctime} {name} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'console',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': LOG_LEVEL,
+    },
+    'loggers': {
+        # Request warnings/errors (4xx/5xx) surface; routine request lines
+        # are gunicorn's access log's job, not Django's.
+        'django': {'level': LOG_LEVEL},
+    },
+}
 
 # manage.py test / pytest should not require a collected manifest or HTTPS.
 TESTING = env_bool('DJANGO_TEST', default=False) or any(
