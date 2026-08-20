@@ -32,10 +32,17 @@ def env_bool(name: str, default: bool = False) -> bool:
     string (including "False", "0", "no") evaluates to True.
 
     Truthy values (case-insensitive): "1", "true", "yes", "on".
-    Everything else — including unset — is falsy.
+    Everything else is falsy.
+
+    An unset OR blank value falls back to `default`. Blank matters: .env.example
+    documents "leave blank for the default" (TRUST_PROXY=, SECURE_SSL_REDIRECT=,
+    SECURE_HSTS_PRELOAD=) and Railway's dashboard happily stores empty strings.
+    Treating "" as False turned those into hard opt-outs, which made the
+    entrypoint's `check --deploy --fail-level WARNING` release gate refuse to
+    boot the image (W008/W021) — a crashloop from following our own docs.
     """
     raw = env(name)
-    if raw is None:
+    if raw is None or not raw.strip():
         return default
     return raw.strip().lower() in {"1", "true", "yes", "on"}
 

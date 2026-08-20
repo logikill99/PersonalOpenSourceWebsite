@@ -36,12 +36,25 @@ class SettingsHelperTests(SimpleTestCase):
             "no": False,
             "off": False,
             "False": False,
-            "": False,
+            # NB: "" is covered by test_env_bool_blank_uses_default_not_false —
+            # blank means "use the default", which here happens to be False.
         }
         for raw, expected in cases.items():
             with self.subTest(raw=raw):
                 with patch.dict(os.environ, {"UNIT_BOOL": raw}, clear=False):
                     self.assertEqual(project_settings.env_bool("UNIT_BOOL"), expected)
+
+    def test_env_bool_blank_uses_default_not_false(self):
+        """Regression: .env.example documents `TRUST_PROXY=` / `SECURE_SSL_REDIRECT=`
+        / `SECURE_HSTS_PRELOAD=` as "blank means the default", and Railway stores
+        empty strings for untouched vars. Treating "" as False turned those into
+        opt-outs and made entrypoint.sh's `check --deploy --fail-level WARNING`
+        release gate refuse to boot the image."""
+        for raw in ("", "   ", "\t"):
+            with self.subTest(raw=raw):
+                with patch.dict(os.environ, {"UNIT_BOOL": raw}, clear=False):
+                    self.assertTrue(project_settings.env_bool("UNIT_BOOL", default=True))
+                    self.assertFalse(project_settings.env_bool("UNIT_BOOL", default=False))
 
     def test_env_bool_unset_uses_default(self):
         with patch.dict(os.environ, {}, clear=False):
@@ -123,6 +136,60 @@ class EmailBackendOverrideTests(SimpleTestCase):
         env = {"EMAIL_BACKEND": ""}
         backend = self._backend_with_env(env)
         self.assertEqual(backend, "django.core.mail.backends.smtp.EmailBackend")
+
+
+class DeployGateTests(SimpleTestCase):
+    """entrypoint.sh gates the boot on `check --deploy --fail-level WARNING`, so
+    any env shape that silently flips a security setting off becomes a
+    crashloop. These run the real check in a subprocess against a prod-like env."""
+
+    def _check_deploy(self, extra_env):
+        repo = Path(__file__).resolve().parent.parent
+        env = os.environ.copy()
+        for key in ("DJANGO_TEST", "DEBUG", "TRUST_PROXY", "SECURE_SSL_REDIRECT",
+                    "SECURE_HSTS_PRELOAD"):
+            env.pop(key, None)
+        env.update(
+            {
+                # >=50 chars and varied, or check --deploy raises W009 on its own.
+                "SECRET_KEY": "x7Qvkd9wPzR3mNuT8bLfHjA2sYcEgVnXpQ4tZrWmKdBhJyGa6uCiSo",
+                "ALLOWED_HOSTS": "mslevin.dev",
+                "DEBUG": "False",
+                "PYTHONPATH": str(repo),
+                **extra_env,
+            }
+        )
+        return subprocess.run(
+            [sys.executable, "manage.py", "check", "--deploy", "--fail-level", "WARNING"],
+            cwd=repo, env=env, capture_output=True, text=True, check=False,
+        )
+
+    def test_clean_prod_env_passes(self):
+        result = self._check_deploy({})
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_blank_security_env_vars_still_pass(self):
+        """Regression: `.env.example` documents these as blank-for-default and
+        Railway stores empty strings, but env_bool read "" as False, so
+        SECURE_SSL_REDIRECT/HSTS_PRELOAD went off and the gate refused to boot
+        (W008 + W021)."""
+        result = self._check_deploy(
+            {"TRUST_PROXY": "", "SECURE_SSL_REDIRECT": "", "SECURE_HSTS_PRELOAD": ""}
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_gate_still_rejects_a_genuinely_insecure_env(self):
+        """The gate must not have been softened into uselessness."""
+        result = self._check_deploy({"SECURE_SSL_REDIRECT": "False"})
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("W008", result.stdout + result.stderr)
+
+    def test_gate_catches_django_test_flag_leaking_into_prod(self):
+        result = self._check_deploy({"DJANGO_TEST": "1"})
+        self.assertNotEqual(result.returncode, 0)
+        combined = result.stdout + result.stderr
+        for warning in ("W008", "W012", "W016"):
+            self.assertIn(warning, combined)
 
 
 class RateLimitClientIPTests(TestCase):
