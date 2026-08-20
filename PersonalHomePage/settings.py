@@ -242,9 +242,10 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# Media files (user uploads)
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+# No user media in v1 (LOG.md 2026-08-20): every image on the site is a
+# static asset served by WhiteNoise. There is intentionally no MEDIA_URL,
+# MEDIA_ROOT, or upload model, so nothing can 404 behind a DEBUG-only
+# static() helper in production.
 
 # WhiteNoise static file serving (Django 4.2+ STORAGES API)
 STORAGES = {
