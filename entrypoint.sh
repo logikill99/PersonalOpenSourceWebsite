@@ -11,6 +11,9 @@ fi
 # Apply database migrations
 python3 manage.py migrate --noinput
 
+# Rate-limiter cache table (DatabaseCache). Idempotent: no-op if it exists.
+python3 manage.py createcachetable
+
 # Create superuser if credentials are provided via environment variables.
 # Do not swallow real failures: "user already exists" is the only expected miss.
 if [ -n "$DJANGO_SUPERUSER_USERNAME" ] && [ -n "$DJANGO_SUPERUSER_PASSWORD" ]; then

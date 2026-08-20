@@ -77,8 +77,11 @@ if 'healthcheck.railway.app' not in ALLOWED_HOSTS:
     ALLOWED_HOSTS.append('healthcheck.railway.app')
 
 # Railway / any TLS-terminating proxy. Trust X-Forwarded-Proto so secure
-# cookies and CSRF work behind https://mslevin.dev.
-if env_bool('TRUST_PROXY', default=not DEBUG):
+# cookies and CSRF work behind https://mslevin.dev. TRUST_PROXY also gates
+# whether the rate limiter reads X-Forwarded-For (see ratelimit.py): only
+# the single trusted edge proxy may vouch for a client IP.
+TRUST_PROXY = env_bool('TRUST_PROXY', default=not DEBUG)
+if TRUST_PROXY:
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     USE_X_FORWARDED_HOST = True
 
@@ -204,6 +207,17 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': env('DATABASE_PATH') or (BASE_DIR / 'db.sqlite3'),
+    }
+}
+
+# DB-backed cache so the rate limiter is shared across gunicorn workers.
+# LocMemCache is per-process and would multiply the limit by the worker
+# count. entrypoint.sh runs `createcachetable` at boot; the test runner
+# creates the table automatically.
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+        'LOCATION': 'django_cache',
     }
 }
 

@@ -125,6 +125,75 @@ class EmailBackendOverrideTests(SimpleTestCase):
         self.assertEqual(backend, "django.core.mail.backends.smtp.EmailBackend")
 
 
+class RateLimitClientIPTests(TestCase):
+    """The limiter key must not be spoofable via X-Forwarded-For."""
+
+    def _request(self, remote="9.9.9.9", xff=None):
+        from django.test import RequestFactory
+
+        extra = {"REMOTE_ADDR": remote}
+        if xff is not None:
+            extra["HTTP_X_FORWARDED_FOR"] = xff
+        return RequestFactory().get("/", **extra)
+
+    def test_untrusted_proxy_ignores_xff_entirely(self):
+        from PersonalHomePage.ratelimit import client_ip
+
+        with self.settings(TRUST_PROXY=False):
+            request = self._request(xff="1.2.3.4")
+            self.assertEqual(client_ip(request), "9.9.9.9")
+
+    def test_trusted_proxy_uses_rightmost_xff_entry(self):
+        from PersonalHomePage.ratelimit import client_ip
+
+        with self.settings(TRUST_PROXY=True):
+            # Client forged "6.6.6.6"; Railway appended the real 5.5.5.5.
+            request = self._request(xff="6.6.6.6, 5.5.5.5")
+            self.assertEqual(client_ip(request), "5.5.5.5")
+
+    def test_garbage_xff_falls_back_to_remote_addr(self):
+        from PersonalHomePage.ratelimit import client_ip
+
+        with self.settings(TRUST_PROXY=True):
+            for garbage in ("not-an-ip", "", "1.2.3.4; DROP TABLE", "a, b"):
+                request = self._request(xff=garbage)
+                self.assertEqual(client_ip(request), "9.9.9.9", garbage)
+
+    def test_spoofed_xff_cannot_bypass_contact_rate_limit(self):
+        from django.core.cache import cache
+
+        cache.clear()
+        payload = {
+            "first_name": "Ada",
+            "last_name": "Lovelace",
+            "email": "ada@example.com",
+            "message": "burst",
+        }
+        with self.settings(
+            TRUST_PROXY=False,
+            EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
+            EMAIL_HOST_USER="matt@example.com",
+        ):
+            for i in range(3):
+                self.client.post(
+                    "/contactme/", payload, HTTP_X_FORWARDED_FOR=f"10.0.0.{i}"
+                )
+            response = self.client.post(
+                "/contactme/", payload, HTTP_X_FORWARDED_FOR="10.0.0.99"
+            )
+        self.assertContains(response, "Too many messages")
+
+    def test_database_cache_backend_is_active(self):
+        # Guards against a silent fallback to LocMemCache, which is
+        # per-process and would multiply the limit by the worker count.
+        from django.conf import settings as live_settings
+
+        self.assertEqual(
+            live_settings.CACHES["default"]["BACKEND"],
+            "django.core.cache.backends.db.DatabaseCache",
+        )
+
+
 class ProxySettingsSmokeTests(SimpleTestCase):
     def test_csrf_origins_derived_from_allowed_hosts(self):
         self.assertTrue(hasattr(project_settings, "CSRF_TRUSTED_ORIGINS"))
