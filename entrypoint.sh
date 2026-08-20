@@ -1,6 +1,18 @@
 #!/bin/sh
 set -e
 
+# Privilege drop: the container starts as root only so this block can chown
+# the Railway volume mount (which arrives root-owned). Everything after the
+# su-exec re-exec — deploy check, migrations, gunicorn — runs as appuser.
+if [ "$(id -u)" = "0" ]; then
+    if [ -n "$DATABASE_PATH" ]; then
+        DB_DIR=$(dirname "$DATABASE_PATH")
+        mkdir -p "$DB_DIR"
+        chown -R appuser:appuser "$DB_DIR"
+    fi
+    exec su-exec appuser "$0" "$@"
+fi
+
 # If DATABASE_PATH is set (e.g. /data/db.sqlite3 on a Railway volume), make
 # sure the parent directory exists so SQLite can create the file.
 if [ -n "$DATABASE_PATH" ]; then
