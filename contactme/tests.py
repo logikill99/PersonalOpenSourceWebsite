@@ -58,6 +58,23 @@ class ContactFormTests(TestCase):
         # retry does not lose it.
         self.assertContains(response, "this should not echo smtp errors")
 
+    def test_zero_accepted_messages_is_a_delivery_failure(self):
+        # send_mail can return 0 without raising (e.g. the SMTP backend with
+        # an empty recipient list when EMAIL_HOST_USER is blank). That must
+        # surface as the failure path, not the success redirect.
+        with patch("contactme.views.send_mail", return_value=0):
+            response = self.client.post(
+                "/contactme/",
+                {
+                    **VALID_CONTACT,
+                    "message": "zero accepted must not look sent",
+                },
+            )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "was not delivered")
+        # Visitor input survives the re-render for retry.
+        self.assertContains(response, "zero accepted must not look sent")
+
     def test_rate_limit_blocks_burst_posts(self):
         for _ in range(3):
             self.client.post("/contactme/", VALID_CONTACT)
