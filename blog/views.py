@@ -1,32 +1,38 @@
-from django.shortcuts import render
+from django.contrib import messages
 from django.http import HttpResponseRedirect
+from django.shortcuts import get_object_or_404, render
 
+from PersonalHomePage.ratelimit import is_rate_limited
 from blog.forms import CommentForm
 from blog.models import Comment, Post
 
 
-# Create your views here.
 def blog_detail(request, pk: int):
-    post = Post.objects.get(pk=pk)
+    post = get_object_or_404(Post, pk=pk)
     form = CommentForm()
     if request.method == "POST":
+        if request.POST.get("website"):
+            return HttpResponseRedirect(request.path_info)
         form = CommentForm(request.POST)
         if form.is_valid():
-            comment = Comment(
-                author=form.cleaned_data["author"],
-                body=form.cleaned_data["body"],
-                post=post,
-            )
-            comment.save()
-            return HttpResponseRedirect(request.path_info)
-    comments = Comment.objects.filter(post=post)
+            if is_rate_limited(request, key_prefix="comment", record=True):
+                messages.error(request, "Too many comments. Wait a minute and try again.")
+            else:
+                Comment.objects.create(
+                    author=form.cleaned_data["author"],
+                    body=form.cleaned_data["body"],
+                    post=post,
+                )
+                messages.success(
+                    request, "Thanks! Your comment is awaiting moderation."
+                )
+                return HttpResponseRedirect(request.path_info)
+    comments = Comment.objects.filter(post=post, approved=True)
     context = {"post": post, "comments": comments, "form": form}
-
     return render(request, "post_detail.html", context)
 
 
 def blog_index(request):
-
     posts = Post.objects.all().order_by("-created_on")
     context = {"posts": posts}
     return render(request, "blog_index.html", context)

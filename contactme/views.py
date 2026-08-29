@@ -1,42 +1,56 @@
-from django.shortcuts import render, redirect
-from .models import Contact, Message
-from .forms import ContactForm, MessageForm
-from django.shortcuts import render
-from django.http import HttpResponse
-from django.core.mail import send_mail
+import logging
+
 from django.conf import settings
+from django.contrib import messages
+from django.core.mail import send_mail
+from django.shortcuts import redirect, render
+
+from PersonalHomePage.ratelimit import is_rate_limited
+
+from .forms import ContactForm
+
+logger = logging.getLogger(__name__)
 
 
 def contact_view(request):
     if request.method == 'POST':
-        contact_form = ContactForm(request.POST)
-        message_form = MessageForm(request.POST)
+        if request.POST.get('website'):
+            return redirect('success')
 
-        if contact_form.is_valid() and message_form.is_valid():
-            if not Contact.objects.filter(email=contact_form.cleaned_data['email']).exists():
-                contact_form.save()
+        form = ContactForm(request.POST)
 
-            contact = Contact.objects.get(email=contact_form.cleaned_data['email'])
-            message = Message(contact=contact, message=message_form.cleaned_data['message'])
-            message.save()
+        if form.is_valid():
+            if is_rate_limited(request, key_prefix='contact', record=True):
+                messages.error(request, 'Too many messages. Wait a minute and try again.')
+                return render(request, 'contact.html', {'form': form})
+
+            data = form.cleaned_data
             try:
                 send_mail(
                     'New Message',
-                    f'You have a new message from {contact.first_name} {contact.last_name}.\n\n'
-                    f'Email: {contact.email}\n\n'
-                    f'Phone Number: {contact.phone_number}\n\n'
-                    f'Message: {message.message}',
-                    settings.EMAIL_HOST_USER,
+                    f'You have a new message from {data["first_name"]} {data["last_name"]}.\n\n'
+                    f'Email: {data["email"]}\n\n'
+                    f'Phone Number: {data["phone_number"]}\n\n'
+                    f'Message: {data["message"]}',
+                    settings.DEFAULT_FROM_EMAIL,
                     [settings.EMAIL_HOST_USER],
                     fail_silently=False,
                 )
-            except Exception as e:
-                return HttpResponse(f'Error: {e}') # TODO: Add a better error page
+            except Exception:
+                # Email-only policy: nothing is persisted, so a delivery
+                # failure means the message is lost unless the visitor
+                # retries. Keep their input in the re-rendered form.
+                logger.exception('Contact form email failed')
+                messages.error(
+                    request,
+                    'Sending failed. Your message was not delivered — '
+                    'please try again in a minute.',
+                )
+                return render(request, 'contact.html', {'form': form})
             return redirect('success')
     else:
-        contact_form = ContactForm()
-        message_form = MessageForm()
-    return render(request, 'contact.html', {'contact_form': contact_form, 'message_form': message_form})
+        form = ContactForm()
+    return render(request, 'contact.html', {'form': form})
 
 
 def contact_success_view(request):

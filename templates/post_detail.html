@@ -1,10 +1,6 @@
 {% extends 'base.html' %}
 {% block page_title %}
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>{{ post.title }}</title>
-    </head>
+    <title>{{ post.title }}</title>
 {% endblock page_title %}
 
 {% block page_content %}
@@ -15,25 +11,40 @@
     </section>
     <section class="comments">
         <h3>Leave a comment:</h3>
-        <form method="post">
+        {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        <form method="post" class="site-form">
             {% csrf_token %}
             <div class="form-group">
+                <label for="id_author">Name</label>
                 {{ form.author }}
             </div>
             <div class="form-group">
+                <label for="id_body">Comment</label>
                 {{ form.body }}
             </div>
-            <button type="submit" class="button">Submit</button>
+            <p class="hp" aria-hidden="true">
+                <label for="id_website">Website</label>
+                <input type="text" name="website" id="id_website" value="" tabindex="-1" autocomplete="off">
+            </p>
+            <button type="submit" class="btn btn-default">Submit</button>
         </form>
 
         <h3>Comments:</h3>
         {% for comment in comments %}
-            <p>
-                On {{ comment.created_on.date }} <b>{{ comment.author }}</b> wrote:
-            </p>
-            <p>
-                {{ comment.body | linebreaks }}
-            </p>
+            <article class="comment">
+                <p class="comment-meta">
+                    On {{ comment.created_on.date }} <b>{{ comment.author }}</b> wrote:
+                </p>
+                <div class="comment-body">
+                    {{ comment.body | linebreaks }}
+                </div>
+            </article>
         {% endfor %}
     </section>
 {% endblock page_content %}

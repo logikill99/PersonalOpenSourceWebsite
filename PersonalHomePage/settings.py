@@ -10,34 +10,136 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
+import sys
 from pathlib import Path
+
+from django.core.exceptions import ImproperlyConfigured
+from django.utils.csp import CSP
 from dotenv import load_dotenv
 from os import getenv as env
 from os import path
-import phonenumber_field
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 # Load environment variables from .env file
 load_dotenv(path.join(BASE_DIR, '.env'))
 
+
+def env_bool(name: str, default: bool = False) -> bool:
+    """Parse a boolean env var explicitly.
+
+    Avoids the classic `bool(os.getenv(...))` footgun where any non-empty
+    string (including "False", "0", "no") evaluates to True.
+
+    Truthy values (case-insensitive): "1", "true", "yes", "on".
+    Everything else is falsy.
+
+    An unset OR blank value falls back to `default`. Blank matters: .env.example
+    documents "leave blank for the default" (TRUST_PROXY=, SECURE_SSL_REDIRECT=,
+    SECURE_HSTS_PRELOAD=) and Railway's dashboard happily stores empty strings.
+    Treating "" as False turned those into hard opt-outs, which made the
+    entrypoint's `check --deploy --fail-level WARNING` release gate refuse to
+    boot the image (W008/W021) — a crashloop from following our own docs.
+    """
+    raw = env(name)
+    if raw is None or not raw.strip():
+        return default
+    return raw.strip().lower() in {"1", "true", "yes", "on"}
+
+
+def env_list(name: str, default: list[str] | None = None) -> list[str]:
+    """Parse a comma-separated env var into a list of strings.
+
+    Strips whitespace around each item and drops empties, so
+    "example.com, www.example.com,, " -> ["example.com", "www.example.com"].
+    """
+    raw = env(name)
+    if raw is None:
+        return list(default) if default is not None else []
+    return [item.strip() for item in raw.split(",") if item.strip()]
+
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = str(env('SECRET_KEY'))
-
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = bool(env('DEBUG'))
+DEBUG = env_bool('DEBUG', default=False)
 
-ADMINS = [(str(env('ADMIN_NAME')), str(env('ADMIN_EMAIL')))]
+# SECURITY WARNING: keep the secret key used in production secret!
+# Always required. DEBUG=True is not an excuse for a baked-in key that can
+# leak into a Railway image if someone flips the wrong env var.
+_secret_key = env('SECRET_KEY')
+if not _secret_key:
+    raise ImproperlyConfigured(
+        'SECRET_KEY environment variable is required. '
+        'Refusing to start without it.'
+    )
+SECRET_KEY = _secret_key
 
-EMAIL_HOST_USER = str(
-    env('EMAIL_HOST_USER'))  # email address that will be used to send emails (should be a gmail account)
+# Comma-separated list of host/domain names this site can serve.
+# e.g. ALLOWED_HOSTS=example.com,www.example.com
+# Empty list fail-closes (Django denies every Host). That is intentional.
+ALLOWED_HOSTS = env_list('ALLOWED_HOSTS')
+# Railway probes /health/ with this Host. Harmless if unused locally.
+if 'healthcheck.railway.app' not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append('healthcheck.railway.app')
 
-EMAIL_HOST_PASSWORD = str(env('EMAIL_HOST_PASSWORD'))  # password of the email-id
+# Railway / any TLS-terminating proxy. Trust X-Forwarded-Proto so secure
+# cookies and CSRF work behind https://mslevin.dev. TRUST_PROXY also gates
+# whether the rate limiter reads X-Forwarded-For (see ratelimit.py): only
+# the single trusted edge proxy may vouch for a client IP.
+TRUST_PROXY = env_bool('TRUST_PROXY', default=not DEBUG)
+if TRUST_PROXY:
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    USE_X_FORWARDED_HOST = True
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# Which socket peers may vouch for a client IP via X-Forwarded-For. Empty =
+# use ratelimit._DEFAULT_TRUSTED_PROXY_IPS (loopback + RFC1918 + CGNAT + IPv6
+# ULA/link-local), which is what a container behind a platform edge sees.
+# Only consulted when TRUST_PROXY is on. Set explicitly if your edge reaches
+# the container from a public address; `0.0.0.0/0,::/0` restores the old
+# trust-anything behaviour. See PersonalHomePage/ratelimit.py.
+TRUSTED_PROXY_IPS = env_list('TRUSTED_PROXY_IPS')
+
+# Explicit origins preferred. If unset, derive https:// from ALLOWED_HOSTS
+# so a Railway deploy with ALLOWED_HOSTS=mslevin.dev,www.mslevin.dev works.
+_csrf_origins = env_list('CSRF_TRUSTED_ORIGINS')
+if _csrf_origins:
+    CSRF_TRUSTED_ORIGINS = _csrf_origins
+else:
+    CSRF_TRUSTED_ORIGINS = []
+    for host in ALLOWED_HOSTS:
+        if not host or host in {'localhost', '127.0.0.1', '[::1]', 'healthcheck.railway.app'}:
+            continue
+        if host.startswith('.'):
+            CSRF_TRUSTED_ORIGINS.append(f'https://*{host}')
+        elif host.startswith('*.'):
+            CSRF_TRUSTED_ORIGINS.append(f'https://{host}')
+        else:
+            CSRF_TRUSTED_ORIGINS.append(f'https://{host}')
+    if DEBUG:
+        CSRF_TRUSTED_ORIGINS.extend(
+            [
+                'http://localhost',
+                'http://127.0.0.1',
+                'http://localhost:8000',
+                'http://127.0.0.1:8000',
+            ]
+        )
+
+# Django 6.0 deprecates ADMINS as a list of (name, email) tuples; use the
+# "Name <email>" string format (or bare email) instead.
+_admin_name = env('ADMIN_NAME', '')
+_admin_email = env('ADMIN_EMAIL', '')
+ADMINS = [f'{_admin_name} <{_admin_email}>' if _admin_name else _admin_email] if _admin_email else []
+
+EMAIL_HOST_USER = env('EMAIL_HOST_USER', '')  # email address that will be used to send emails (should be a gmail account)
+
+EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD', '')  # password of the email-id
+
+# Overridable so local dev can use the console backend without SMTP creds.
+# e.g. EMAIL_BACKEND=django.core.mail.backends.console.EmailBackend
+EMAIL_BACKEND = env('EMAIL_BACKEND') or 'django.core.mail.backends.smtp.EmailBackend'
 
 EMAIL_HOST = 'smtp.gmail.com'
 
@@ -47,27 +149,26 @@ EMAIL_PORT = 587
 
 REGION = 'US'
 
-LISTED_NAME = str(env('LISTED_NAME'))  # name that will be listed on the home page
+LISTED_NAME = env('LISTED_NAME', '')  # name that will be listed on the home page
 
-LISTED_TITLE = str(env('LISTED_TITLE'))  # title that will be listed on the home page
+LISTED_TITLE = env('LISTED_TITLE', '')  # title that will be listed on the home page
 
-LISTED_EMAIL = str(env('LISTED_EMAIL'))  # email that will be listed on the home page
+LISTED_EMAIL = env('LISTED_EMAIL', '')  # email that will be listed on the home page
 
-LISTED_PHONE = str(env('LISTED_PHONE'))  # phone number that will be listed on the home page
+LISTED_PHONE = env('LISTED_PHONE', '')  # phone number that will be listed on the home page
 
-LISTED_GITHUB = str(env('LISTED_GITHUB'))  # github link
+LISTED_GITHUB = env('LISTED_GITHUB', '')  # github link
 
-LISTED_LINKEDIN = str(env('LISTED_LINKEDIN'))  # linkedin link
+LISTED_LINKEDIN = env('LISTED_LINKEDIN', '')  # linkedin link
 
-LISTED_TWITTER = str(env('LISTED_TWITTER'))  # twitter link
+LISTED_TWITTER = env('LISTED_TWITTER', '')  # twitter link
 
-LISTED_DISCORD = str(env('LISTED_DISCORD'))  # discord link
+LISTED_DISCORD = env('LISTED_DISCORD', '')  # discord link
 
-ALLOWED_HOSTS = [str(env('ALLOWED_HOSTS'))]
+LISTED_IN_TEXT_TITLE = env('IN_TEXT_TITLE', '')  # Title that will appear in text and blurbs
 
-LISTED_IN_TEXT_TITLE = str(env('IN_TEXT_TITLE'))  # Title that will appear in text and blurbs
+HOMEPAGE_IMAGE_CAPTION = env('HOMEPAGE_IMAGE_CAPTION', '')
 
-HOMEPAGE_IMAGE_CAPTION = str(env('HOMEPAGE_IMAGE_CAPTION'))
 # Application definition
 
 INSTALLED_APPS = [
@@ -83,10 +184,11 @@ INSTALLED_APPS = [
     "phonenumber_field",
 ]
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'django.middleware.csp.ContentSecurityPolicyMiddleware',
+    'PersonalHomePage.middleware.AdminAccessMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -94,6 +196,10 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+# Optional: restrict /admin/ to these IPs/CIDRs (comma-separated). Unset
+# leaves the admin reachable (login still rate limited); see middleware.py.
+ADMIN_IP_ALLOWLIST = env_list('ADMIN_IP_ALLOWLIST')
 
 ROOT_URLCONF = 'PersonalHomePage.urls'
 
@@ -122,7 +228,18 @@ WSGI_APPLICATION = 'PersonalHomePage.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': env('DATABASE_PATH') or (BASE_DIR / 'db.sqlite3'),
+    }
+}
+
+# DB-backed cache so the rate limiter is shared across gunicorn workers.
+# LocMemCache is per-process and would multiply the limit by the worker
+# count. entrypoint.sh runs `createcachetable` at boot; the test runner
+# creates the table automatically.
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+        'LOCATION': 'django_cache',
     }
 }
 
@@ -159,12 +276,118 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# No user media in v1 (LOG.md 2026-08-20): every image on the site is a
+# static asset served by WhiteNoise. There is intentionally no MEDIA_URL,
+# MEDIA_ROOT, or upload model, so nothing can 404 behind a DEBUG-only
+# static() helper in production.
+
+# WhiteNoise static file serving (Django 4.2+ STORAGES API)
+STORAGES = {
+    'default': {
+        'BACKEND': 'django.core.files.storage.FileSystemStorage',
+    },
+    'staticfiles': {
+        'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
+    },
+}
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CSRF_COOKIE_SECURE = True
+# --- Security headers -------------------------------------------------------
+# Harmless in dev, so they are on everywhere; only HTTPS-dependent settings
+# (secure cookies, SSL redirect, HSTS) are gated on DEBUG below.
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
+X_FRAME_OPTIONS = 'DENY'
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = 'Lax'
+CSRF_COOKIE_SAMESITE = 'Lax'
 
-SESSION_COOKIE_SECURE = True
+# Content-Security-Policy (Django 6 native middleware, enforced not
+# report-only). Relaxations, each deliberate:
+# - script-src allows the jsdelivr CDN for the pinned+SRI Alpine bundle.
+# - 'unsafe-eval' is required by the standard Alpine build, which compiles
+#   x-data/x-show expressions with new Function(). It does NOT allow inline
+#   <script> injection — script-src still blocks the primary XSS vector,
+#   which matters because post bodies render with |safe.
+# - fonts.googleapis.com / fonts.gstatic.com serve the Roboto face that
+#   style.css @imports (line 3). Without them style-src blocked the import on
+#   every page and the site silently fell back to the generic sans-serif.
+#   Self-hosting the font would drop both origins; tracked as a follow-up.
+# - frame-ancestors 'none' mirrors X-Frame-Options: DENY.
+SECURE_CSP = {
+    'default-src': [CSP.SELF],
+    'script-src': [CSP.SELF, 'https://cdn.jsdelivr.net', CSP.UNSAFE_EVAL],
+    'style-src': [CSP.SELF, 'https://fonts.googleapis.com'],
+    'img-src': [CSP.SELF],
+    'font-src': [CSP.SELF, 'https://fonts.gstatic.com'],
+    'connect-src': [CSP.SELF],
+    'object-src': [CSP.NONE],
+    'base-uri': [CSP.SELF],
+    'form-action': [CSP.SELF],
+    'frame-ancestors': [CSP.NONE],
+}
+
+# Secure cookies in production. Local DEBUG keeps them off so http://localhost works.
+CSRF_COOKIE_SECURE = not DEBUG
+SESSION_COOKIE_SECURE = not DEBUG
+SECURE_SSL_REDIRECT = env_bool('SECURE_SSL_REDIRECT', default=not DEBUG)
+SECURE_REDIRECT_EXEMPT = [r'^health/$', r'^healthcheck/$']
+SERVER_EMAIL = env('SERVER_EMAIL') or env('ADMIN_EMAIL') or 'webmaster@localhost'
+DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL') or EMAIL_HOST_USER or SERVER_EMAIL
+if not DEBUG:
+    SECURE_HSTS_SECONDS = int(env('SECURE_HSTS_SECONDS') or '31536000')
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    # Default True so `check --deploy --fail-level WARNING` (run by
+    # entrypoint.sh as a release gate) passes clean. The header alone only
+    # makes the domain *eligible* for browser preload lists; nothing is
+    # submitted automatically. Opt out with SECURE_HSTS_PRELOAD=False.
+    SECURE_HSTS_PRELOAD = env_bool('SECURE_HSTS_PRELOAD', default=True)
+
+# Logging: everything to stdout/stderr for Railway to collect. INFO by
+# default (no debug noise in prod); override with LOG_LEVEL=DEBUG locally.
+LOG_LEVEL = (env('LOG_LEVEL') or 'INFO').upper()
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'console': {
+            'format': '{levelname} {asctime} {name} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'console',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': LOG_LEVEL,
+    },
+    'loggers': {
+        # Request warnings/errors (4xx/5xx) surface; routine request lines
+        # are gunicorn's access log's job, not Django's.
+        'django': {'level': LOG_LEVEL},
+    },
+}
+
+# manage.py test / pytest should not require a collected manifest or HTTPS.
+TESTING = env_bool('DJANGO_TEST', default=False) or any(
+    arg in sys.argv for arg in ('test', 'pytest')
+)
+if TESTING:
+    STORAGES['staticfiles'] = {
+        'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage',
+    }
+    SECURE_SSL_REDIRECT = False
+    CSRF_COOKIE_SECURE = False
+    SESSION_COOKIE_SECURE = False
+    if not ALLOWED_HOSTS:
+        ALLOWED_HOSTS = ['testserver', 'localhost', '127.0.0.1']

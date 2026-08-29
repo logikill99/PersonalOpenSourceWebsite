@@ -10,6 +10,8 @@
     --header-text-color: #E49B5D;
     --secondary-text-color: #C1A78E;
     --border-color: #333;
+    --error-color: #E07A5F;
+    color-scheme: dark;
 }
 
 body {
@@ -18,13 +20,13 @@ body {
     background-color: var(--background-color);
     color: var(--text-color);
     font-family: 'Roboto', sans-serif;
+    overflow-y: scroll;
 }
 
 .page-header {
     text-align: center;
     background-color: var(--header-bg-color);
-    padding: 30px;
-    padding-top: 20px;
+    padding: 20px 30px 30px;
     border-bottom: 1px solid var(--border-color);
 }
 
@@ -39,6 +41,12 @@ h2 {
     margin: 0;
     padding-top: 40px;
     color: var(--header-text-color);
+}
+
+h3 {
+    font-size: 1.8em;
+    margin-bottom: 10px;
+    color: var(--secondary-text-color);
 }
 
 header p {
@@ -65,12 +73,19 @@ nav a {
     color: var(--text-color);
     text-decoration: none;
     margin: 0 10px;
+    transition: color 0.2s, transform 0.2s;
 }
 
 nav > a:hover {
     color: var(--secondary-text-color);
     transform: translateY(-1px);
-    transition: 0.2s;
+}
+
+a {
+    color: var(--text-color);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border-bottom 0.3s;
 }
 
 section {
@@ -86,6 +101,8 @@ section h2 {
     border-bottom: 2px solid var(--border-color);
     padding-bottom: 10px;
 }
+
+/* ---------- Blog ---------- */
 
 .blog-list .post {
     margin-bottom: 40px;
@@ -121,19 +138,21 @@ section h2 {
     color: var(--secondary-text-color);
     text-decoration: none;
     font-weight: bold;
+    transition: color 0.3s;
 }
 
 .blog-list .post .read-more:hover {
     color: var(--accent-color);
-    transition: color 0.3s;
 }
 
-a {
-    color: var(--text-color);
-    text-decoration: none;
-    border-bottom: 1px solid transparent;
-    transition: border-bottom 0.3s;
+#created-on-date {
+    font-size: 0.4em !important;
+    color: var(--secondary-text-color);
+    margin-bottom: 10px;
+    display: flex;
 }
+
+/* ---------- Projects & cards ---------- */
 
 #projects {
     justify-content: space-between;
@@ -148,18 +167,6 @@ a {
     transition: transform 0.3s;
     min-width: 200px;
     flex: 1 1 25%;
-}
-
-@media only screen and (max-width: 768px) {
-    .project {
-        width: 48%;
-    }
-}
-
-@media only screen and (max-width: 480px) {
-    .project {
-        width: 100%;
-    }
 }
 
 .project:hover {
@@ -181,7 +188,6 @@ a {
 
 .flexwrap-container {
     display: flex;
-    gap: normal;
     flex-wrap: wrap;
     justify-content: space-evenly;
 }
@@ -194,7 +200,6 @@ a {
     border-radius: 8px;
     transition: transform 0.3s;
     text-align: center;
-    /*display: inline-grid;*/
     flex: 0 1 25%;
     min-width: 250px;
 }
@@ -212,12 +217,12 @@ a {
     padding: 0;
     display: grid;
     font-size: 1em;
+    transition: color 0.3s, transform 0.3s;
 }
 
 .info-list a:hover {
     color: var(--secondary-text-color);
     transform: translateY(-1px);
-    transition: 0.3s;
 }
 
 .logo svg {
@@ -233,21 +238,43 @@ a {
     fill: var(--secondary-text-color);
 }
 
+/* ---------- Buttons & inline links ---------- */
 
+button,
+#about-button,
+#pdf-button,
 #contact-button {
     display: inline-block;
-    margin-top: 20px;
-    padding: 10px 20px;
     background-color: var(--accent-color);
     color: var(--text-color);
-    border-radius: 5px;
-
     border: 1px solid var(--border-color);
+    border-radius: 5px;
+    padding: 10px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
 }
 
+button {
+    border-radius: 3px;
+    padding: 10px 20px;
+}
+
+#about-button,
+#pdf-button,
+#contact-button {
+    margin-top: 20px;
+}
+
+#contact-button {
+    padding: 10px 20px;
+}
+
+button:hover,
+#about-button:hover,
+#pdf-button:hover,
 #contact-button:hover {
-    background-color: var(--accent-color);
-    transition: 0.3s;
+    background-color: var(--header-bg-color);
     color: var(--secondary-text-color);
 }
 
@@ -262,56 +289,25 @@ a {
     color: var(--secondary-text-color);
 }
 
-h3 {
-    font-size: 1.8em;
-    margin-bottom: 10px;
+.small-interactive-text {
+    color: var(--text-color);
+    transition: 0.3s;
+    font-size: 0.8em;
+}
+
+.small-interactive-text:hover {
     color: var(--secondary-text-color);
 }
 
-#created-on-date {
-    font-size: 0.4em !important;
-    color: var(--secondary-text-color);
-    margin-bottom: 10px;
-    display: flex;
+.clickable-div {
+    display: block;
+    height: 100%;
+    width: 100%;
+    text-decoration: none;
+    padding: 0;
 }
 
-.form-control {
-    background: var(--header-bg-color);
-    color: var(--text-color);
-    border: 1px solid var(--border-color);
-}
-
-input {
-    background: var(--accent-color);
-    color: var(--text-color);
-    border: 1px solid var(--border-color);
-}
-
-textarea {
-    background: var(--accent-color);
-    color: var(--text-color);
-    border: 1px solid var(--border-color);
-}
-
-
-button {
-    background-color: var(--accent-color);
-    color: var(--text-color);
-    border: 1px solid var(--border-color);
-    border-radius: 3px;
-    padding: 10px 20px;
-    transition: background-color 0.3s;
-}
-
-button:hover {
-    background-color: var(--header-bg-color);
-    color: var(--secondary-text-color);
-    transition: background-color 0.3s;
-}
-
-body {
-    overflow-y: scroll;
-}
+/* ---------- Tooltip ---------- */
 
 .tooltip {
     display: inline-block;
@@ -320,6 +316,7 @@ body {
 }
 
 .tooltip .right {
+    position: absolute;
     min-width: 200px;
     top: 50%;
     left: 100%;
@@ -331,7 +328,6 @@ body {
     font-weight: normal;
     font-size: 13px;
     border-radius: 8px;
-    position: absolute;
     z-index: 99999999;
     box-sizing: border-box;
     visibility: hidden;
@@ -365,20 +361,13 @@ body {
     background-color: var(--accent-color);
 }
 
-.experience-description > p {
-    padding-left: 2em;
-    padding-top: 0;
-    margin-top: 0;
-}
+/* ---------- Experience & skills ---------- */
 
 .experience {
     font-size: 1.1em;
     background-color: var(--header-bg-color);
     width: calc(90% - 100px);
-    padding: 1em;
-    padding-left: 30px;
-    padding-right: 30px;
-    padding-bottom: 10px;
+    padding: 1em 30px 10px;
     margin-bottom: 20px;
     border-radius: 8px;
     transition: transform 0.3s;
@@ -391,7 +380,14 @@ body {
     background-color: var(--accent-color);
 }
 
-.experience-skills {
+.experience-description > p {
+    padding-left: 2em;
+    padding-top: 0;
+    margin-top: 0;
+}
+
+.experience-skills,
+.skills-list {
     display: inline-flex;
     flex-wrap: wrap;
     justify-content: left;
@@ -431,62 +427,17 @@ body {
     margin: 10px;
 }
 
-.clickable-div {
-    display: block;
-    height: 100%;
-    width: 100%;
-    text-decoration: none;
-    padding: 0 0;
+[x-cloak] {
+    display: none !important;
 }
 
-.skills-list {
-    display: inline-flex;
-    flex-wrap: wrap;
-    justify-content: left;
-}
-
-.small-interactive-text {
-    color: var(--text-color);
-    text-decoration: AccentColor;
-    transition: 0.3s;
-    font-size: 0.8em;
-}
-
-.small-interactive-text:hover {
-    color: var(--secondary-text-color);
-}
-
-#about-me-text {
-    max-width: calc(70% - 100px);
-    min-width: 500px;
-    flex-wrap: wrap;
-}
+/* ---------- About ---------- */
 
 #about-me-images {
     max-width: calc(30% - 100px);
     align-items: center;
     display: grid;
     border-radius: 8px;
-}
-
-.about {
-    width: 100%;
-    border-radius: 8px;
-    display: flex;
-
-}
-
-.container {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    align-items: center;
-}
-
-@media only screen and (max-width: 720px) {
-    .container {
-        grid-template-columns: 1fr;
-    }
 }
 
 #about-me-images > img {
@@ -500,10 +451,154 @@ body {
     max-width: 33vw;
 }
 
-/* Existing CSS... */
+.container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    align-items: center;
+}
+
+/* ---------- Forms ---------- */
+
+.site-form {
+    max-width: 28rem;
+}
+
+.comments .site-form {
+    max-width: 22rem;
+}
+
+.site-form p,
+.site-form .form-group {
+    margin: 0 0 0.75rem;
+}
+
+.site-form label {
+    display: block;
+    margin-bottom: 0.35rem;
+    color: var(--secondary-text-color);
+}
+
+.site-form input,
+.site-form textarea,
+.site-form select,
+.form-control {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0.45rem 0.65rem;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    background-color: var(--header-bg-color);
+    color: var(--text-color);
+    font: inherit;
+    line-height: 1.4;
+}
+
+.site-form textarea,
+textarea.form-control {
+    display: block;
+    resize: vertical;
+}
+
+.site-form input:focus-visible,
+.site-form textarea:focus-visible,
+.site-form select:focus-visible,
+.form-control:focus-visible,
+button:focus-visible {
+    outline: 2px solid var(--header-text-color);
+    outline-offset: 1px;
+}
+
+.site-form ::placeholder {
+    color: var(--secondary-text-color);
+    opacity: 1;
+}
+
+.site-form input:-webkit-autofill,
+.site-form input:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0 100px var(--header-bg-color) inset;
+    -webkit-text-fill-color: var(--text-color);
+}
+
+.site-form .helptext {
+    display: block;
+    margin-top: 0.2rem;
+    font-size: 0.8em;
+    color: var(--secondary-text-color);
+}
+
+.site-form button,
+.comments .btn {
+    margin-top: 0.5rem;
+}
+
+.errorlist {
+    list-style: none;
+    margin: 0 0 0.4rem;
+    padding: 0;
+    color: var(--error-color);
+}
+
+.messages {
+    list-style: none;
+    margin: 0 0 1rem;
+    padding: 0;
+}
+
+.messages li {
+    padding: 0.6rem 0.75rem;
+    border-radius: 5px;
+    background-color: var(--header-bg-color);
+    color: var(--header-text-color);
+}
+
+.hp {
+    position: absolute;
+    left: -10000px;
+    top: auto;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+}
+
+/* ---------- Comments ---------- */
+
+.comment {
+    max-width: 40rem;
+    margin: 0 0 1rem;
+    padding: 0.6rem 0.85rem;
+    border-left: 2px solid var(--border-color);
+    background-color: var(--header-bg-color);
+    border-radius: 5px;
+}
+
+.comment-meta {
+    margin: 0 0 0.25rem;
+    font-size: 0.85em;
+    color: var(--secondary-text-color);
+}
+
+.comment-body {
+    line-height: 1.5;
+}
+
+.comment-body p {
+    margin: 0 0 0.5rem;
+}
+
+.comment-body p:last-child {
+    margin-bottom: 0;
+}
+
+/* ---------- Responsive ---------- */
+
+@media only screen and (max-width: 768px) {
+    .project {
+        width: 48%;
+    }
+}
 
 @media only screen and (max-width: 720px) {
-    /* Adjust font sizes for smaller screens */
     header h1 {
         font-size: 2em;
     }
@@ -516,7 +611,6 @@ body {
         font-size: 1.2em;
     }
 
-    /* Stack navigation items vertically */
     nav {
         flex-direction: column;
     }
@@ -525,18 +619,15 @@ body {
         margin: 5px 0;
     }
 
-    /* Reduce padding in sections */
     section {
         padding: 20px 5%;
     }
 
-    /* Adjust project cards to fit smaller screens */
     .project {
         width: 100%;
-        margin: 10px 10px;
+        margin: 10px;
     }
 
-    /* Adjust experience section */
     .experience {
         width: calc(100% - 60px);
     }
@@ -545,13 +636,11 @@ body {
         transform: translateY(-10px);
     }
 
-    /* Adjust image sizing */
     #about-me-images > img {
         max-width: calc(100vw - 60px);
-        margin: 0 0;
-        padding: 0 0;
+        margin: 0;
+        padding: 0;
     }
-
 
     #about-me-images > small {
         margin-left: 20px;
@@ -559,43 +648,13 @@ body {
         max-width: calc(100vw - 60px);
     }
 
-    /* Stack container elements */
     .container {
         grid-template-columns: 1fr;
     }
 }
 
-#about-button {
-    display: inline-block;
-    margin-top: 20px;
-    background-color: var(--accent-color);
-    color: var(--text-color);
-    border-radius: 5px;
-    transition: background-color 0.3s;
-    cursor: pointer;
-    padding: 10px;
-    text-decoration: none;
-}
-
-#about-button:hover {
-    background-color: var(--header-bg-color);
-    color: var(--secondary-text-color);
-    transition: background-color 0.3s;
-}
-
-#pdf-button {
-    display: inline-block;
-    margin-top: 20px;
-    background-color: var(--accent-color);
-    color: var(--text-color);
-    border-radius: 5px;
-    transition: background-color 0.3s;
-    cursor: pointer;
-    padding: 10px;
-    text-decoration: none;
-}
-#pdf-button:hover {
-    background-color: var(--header-bg-color);
-    color: var(--secondary-text-color);
-    transition: background-color 0.3s;
+@media only screen and (max-width: 480px) {
+    .project {
+        width: 100%;
+    }
 }

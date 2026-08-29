@@ -2,21 +2,27 @@
 {% extends "base.html" %}
 
 {% block page_title %}
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Contact Me</title>
-    </head>
+    <title>Contact Me</title>
 {% endblock %}
 
 {% block page_content %}
     <section id="contact">
     <h2>Contact Me</h2>
-        <form method="post">
+        {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        <form method="post" class="site-form">
             {% csrf_token %}
-            {{ contact_form.as_p }}
-            {{ message_form.as_p }}
-            <button type="submit">Submit</button>
+            {{ form.as_p }}
+            <p class="hp" aria-hidden="true">
+                <label for="id_website">Website</label>
+                <input type="text" name="website" id="id_website" value="" tabindex="-1" autocomplete="off">
+            </p>
+            <button type="submit" class="btn btn-default">Submit</button>
         </form>
     </section>
 {% endblock %}

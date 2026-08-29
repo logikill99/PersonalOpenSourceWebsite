@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Blog Posts{% endblock title %}
+{% block page_title %}<title>Blog Posts</title>{% endblock page_title %}
 
 {% block page_content %}
 <section class="blog-list">
@@ -10,7 +10,7 @@
             <article class="post">
                 <h3><a href="{% url 'blog_detail' post.pk %}">{{ post.title }}</a></h3>
                 <small class="post-date">{{ post.created_on.date }}</small>
-                <p>{{ post.body|slice:":400" }}... <a href="{% url 'blog_detail' post.pk %}" class="read-more">Read more</a></p>
+                <p>{{ post.body|striptags|truncatechars:400 }} <a href="{% url 'blog_detail' post.pk %}" class="read-more">Read more</a></p>
             </article>
         {% endfor %}
     {% else %}
