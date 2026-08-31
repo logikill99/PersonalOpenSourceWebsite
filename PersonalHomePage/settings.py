@@ -147,6 +147,11 @@ EMAIL_USE_TLS = True
 
 EMAIL_PORT = 587
 
+# Cap SMTP connect/send time so a blocked or unreachable SMTP host fails
+# fast and the contact view renders its error message, instead of hanging
+# the gunicorn worker until the worker timeout kills it (raw 500).
+EMAIL_TIMEOUT = int(env('EMAIL_TIMEOUT', '') or 10)
+
 REGION = 'US'
 
 LISTED_NAME = env('LISTED_NAME', '')  # name that will be listed on the home page
